@@ -1,11 +1,10 @@
-import { Sequelize, DataTypes } from "sequelize";
+import { DataTypes } from "sequelize";
 import sequelize from "../connections/database";
 import { ROLES } from "../constants/role";
 
 const User = sequelize.define(
   "User",
   {
-    // Model attributes are defined here
     firstName: {
       type: DataTypes.STRING,
       allowNull: false,
@@ -18,14 +17,17 @@ const User = sequelize.define(
       type: DataTypes.STRING,
       allowNull: false,
       unique: true,
+      validate: {
+        isEmail: true,
+      },
     },
     password: {
       type: DataTypes.STRING,
       allowNull: false,
     },
     role: {
-      type: DataTypes.ENUM("admin", "teacher", "viewer"),
-      defaultValue: "viewer",
+      type: DataTypes.ENUM(ROLES.ADMIN, ROLES.TEACHER, ROLES.VIEWER),
+      defaultValue: ROLES.VIEWER,
       allowNull: false,
     },
   },
@@ -36,5 +38,4 @@ const User = sequelize.define(
   },
 );
 
-// `sequelize.define` also returns the model
-console.log(User === sequelize.models.User); // true
+export default User;
