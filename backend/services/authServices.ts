@@ -4,11 +4,22 @@ import User from "../models/User";
 export default {
   signup: async (req: Request) => {
     return await User.create({
-      firstName: "aastha",
-      lastName: "raut",
-      email: "aastharaut03@gmail.com",
-      password: "password123",
-      role: "admin",
+      firstName: req.body.firstName,
+      lastName: req.body.lastName,
+      email: req.body.email,
+      password: req.body.password,
+      role: req.body.role,
     });
+  },
+  login: async (req: Request) => {
+    const { email, password } = req.body;
+
+    const user = await User.findOne({ where: { email } });
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    // Compare password (you'll need bcrypt)
+    return user;
   },
 };
