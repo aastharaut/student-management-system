@@ -18,9 +18,13 @@ export default {
     let user = await User.findOne({ where: { email: req.body.email } });
 
     if (user) {
-      console.log({ user });
       //let hashed_pw = user.getDataValue("password");
       let userData = user.toJSON();
+      console.log({ userData });
+      delete userData.password;
+      delete userData.createdAt;
+      delete userData.updatedAt;
+
       let isMatch = await bcrypt.compare(req.body.password, userData.password);
       if (!isMatch) {
         return false;
