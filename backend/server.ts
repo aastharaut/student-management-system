@@ -3,10 +3,11 @@ import "./connections/database";
 import appRoutes from "./routes/auth";
 import resourceNotFoundHandler from "./middleware/resourceNotFoundHandler";
 import errorHandler from "./middleware/errorHandler";
-
+import "dotenv/config";
 const app = express();
 app.use(express.json());
 
+console.log("JWT_SECRET loaded:", process.env.JWT_SECRET ? "Yes" : "No");
 // auth routes directly at /api rather than /api/auth
 app.use("/api", appRoutes);
 

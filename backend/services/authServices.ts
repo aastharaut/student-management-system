@@ -1,7 +1,8 @@
 import { Request } from "express";
-import User from "../models/User";
 import bcrypt from "bcrypt";
 import jsonwebtoken from "jsonwebtoken";
+
+import User from "../models/User";
 
 export default {
   signup: async (req: Request) => {
@@ -10,45 +11,56 @@ export default {
       firstName: req.body.firstName,
       lastName: req.body.lastName,
       email: req.body.email,
+      isSeller: req.body.isSeller,
       password: hashed,
-      role: req.body.role,
     });
   },
+
   login: async (req: Request) => {
-    let user = await User.findOne({ where: { email: req.body.email } });
+    // Find user by email
+    let user = await User.findOne({
+      where: {
+        email: req.body.email,
+      },
+    });
 
     if (user) {
-      //let hashed_pw = user.getDataValue("password");
       let userData = user.toJSON();
-      console.log({ userData });
+
+      // Compare passwords
+      let passwordMatched = await bcrypt.compare(
+        req.body.password,
+        userData.password,
+      );
+
+      if (!passwordMatched) {
+        return false;
+      }
       delete userData.password;
       delete userData.createdAt;
       delete userData.updatedAt;
 
-      let isMatch = await bcrypt.compare(req.body.password, userData.password);
-      if (!isMatch) {
-        return false;
-      }
-      let token = jsonwebtoken.sign(userData, "secretkey");
-      console.log({ token });
-      return true;
-      //     {
-      //       id: userData.id,
-      //       email: userData.email,
-      //       role: userData.role,
-      //     },
-      //     process.env.JWT_SECRET || "secret",
-      //     {
-      //       expiresIn: "1h",
-      //     },
-      //   );
-      //   user.setDataValue("token", token);
-      //   return user;
+      //jwt token
+      let token = jsonwebtoken.sign(
+        {
+          id: userData.id,
+          email: userData.email,
+          role: userData.role,
+        },
+        process.env.JWT_SECRET || "secretkey",
+        {
+          expiresIn: "1h",
+        },
+      );
+
+      console.log("Token generated:", token);
+
+      return {
+        ...userData,
+        token,
+      };
     }
 
-    if (!user) {
-      throw new Error("User not found");
-    }
-    return user;
+    return false;
   },
 };
