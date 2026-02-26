@@ -18,8 +18,6 @@ export default {
     if (!user) {
       throw new Error("User not found");
     }
-
-    // Compare password (you'll need bcrypt)
     return user;
   },
 };

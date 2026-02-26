@@ -1,15 +1,45 @@
-import { Request, Response, NextFunction } from "express";
-import resourceNotFoundHandler from "./resourceNotFoundHandler";
+import { NextFunction, Request, Response } from "express";
+import {
+  ConnectionError,
+  DatabaseError,
+  TimeoutError,
+  UniqueConstraintError,
+  ValidationError,
+} from "sequelize";
 
 function errorHandler(
-  err: any,
-  req: Request,
+  err: unknown,
+  _req: Request,
   res: Response,
-  next: NextFunction,
+  _next: NextFunction,
 ) {
-  res
-    .status(500)
-    .json({ message: "Internal server error", error: err.message });
+  if (err instanceof ValidationError || err instanceof UniqueConstraintError) {
+    let errors = err.errors.map((el) => {
+      return {
+        field: el.path,
+        message: el.message,
+      };
+    });
+    return res.status(400).send({
+      msg: "Bad Request",
+      errors,
+    });
+  }
+
+  if (err instanceof DatabaseError) {
+    return res.status(500).send({
+      msg: err.message,
+    });
+  }
+
+  if (err instanceof ConnectionError || err instanceof TimeoutError) {
+    return res.status(503).send({
+      msg: err.message,
+    });
+  }
+
+  console.log(err);
+  res.status(500).send({ msg: "server error" });
 }
 
 export default errorHandler;

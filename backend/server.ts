@@ -3,18 +3,17 @@ import "./connections/database";
 import appRoutes from "./routes/auth";
 import resourceNotFoundHandler from "./middleware/resourceNotFoundHandler";
 import errorHandler from "./middleware/errorHandler";
-//import studentRoutes from "./routes/student";
 
-//checkDatabaseConnection();
 const app = express();
-app.use(express.json()); //global middleware to parse JSON bodies
+app.use(express.json());
 
+// auth routes directly at /api rather than /api/auth
 app.use("/api", appRoutes);
-//app.use("/api", studentRoutes);
 
 app.get("/", (req: Request, res: Response) => {
   res.send("Hello, World!");
 });
+
 app.use(resourceNotFoundHandler);
 app.use(errorHandler);
 
