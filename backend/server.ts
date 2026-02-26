@@ -6,10 +6,15 @@ import errorHandler from "./middleware/errorHandler";
 import "dotenv/config";
 const app = express();
 app.use(express.json());
+import studentRoutes from "./routes/student";
+import "./models/User";
+import "./models/Student";
 
 console.log("JWT_SECRET loaded:", process.env.JWT_SECRET ? "Yes" : "No");
+
 // auth routes directly at /api rather than /api/auth
 app.use("/api", appRoutes);
+app.use("/api", studentRoutes); // For /api/students
 
 app.get("/", (req: Request, res: Response) => {
   res.send("Hello, World!");
