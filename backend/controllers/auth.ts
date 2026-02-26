@@ -14,9 +14,8 @@ const authController = {
   login: async (req: Request, res: Response, next: NextFunction) => {
     try {
       let user = await authService.login(req);
-
       if (user) {
-        res.send(user);
+        res.send({ msg: "login successful" });
       } else {
         res.status(401).send({
           msg: "invalid credentials",
