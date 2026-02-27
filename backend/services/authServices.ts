@@ -47,7 +47,7 @@ export default {
           email: userData.email,
           role: userData.role,
         },
-        process.env.JWT_SECRET || "secretkey",
+        process.env.JWT_SECRET || "",
         {
           expiresIn: "1h",
         },
