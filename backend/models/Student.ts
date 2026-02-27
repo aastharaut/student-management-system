@@ -4,11 +4,6 @@ import sequelize from "../connections/database";
 const Student = sequelize.define(
   "Student",
   {
-    id: {
-      type: DataTypes.UUID,
-      defaultValue: DataTypes.UUIDV4,
-      primaryKey: true,
-    },
     name: {
       type: DataTypes.STRING(255),
       allowNull: false,

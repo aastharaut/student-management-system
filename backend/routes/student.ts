@@ -76,29 +76,93 @@ router.get("/students", (req: Request, res: Response) => {
   });
 });
 
-// Create a new student with validation
+// // Create a new student with validation
+// router.post(
+//   "/students",
+//   validateStudent,
+//   async (req: Request, res: Response) => {
+//     const user = (req as any).user;
+//     const studentData = (req as unknown as ValidatedRequest<StudentData>)
+//       .validatedBody;
+
+//     console.log("Creating student:", studentData);
+//     console.log("Created by user:", user);
+
+//     res.status(201).json({
+//       success: true,
+//       msg: "Student created successfully",
+//       data: {
+//         student: studentData,
+//         createdBy: {
+//           id: user.id,
+//           email: user.email,
+//         },
+//       },
+//     });
+//   },
+// );
 router.post(
   "/students",
   validateStudent,
   async (req: Request, res: Response) => {
-    const user = (req as any).user;
-    const studentData = (req as unknown as ValidatedRequest<StudentData>)
-      .validatedBody;
+    try {
+      const user = (req as any).user;
+      const studentData = (req as unknown as ValidatedRequest<StudentData>)
+        .validatedBody;
 
-    console.log("Creating student:", studentData);
-    console.log("Created by user:", user);
+      console.log("Creating student:", studentData);
+      console.log("Created by user:", user);
 
-    res.status(201).json({
-      success: true,
-      msg: "Student created successfully",
-      data: {
-        student: studentData,
-        createdBy: {
-          id: user.id,
-          email: user.email,
+      const newStudent = await Student.create({
+        name: studentData.name,
+        email: studentData.email,
+        age: studentData.age,
+        course: studentData.course,
+        enrollmentDate: studentData.enrollmentDate || new Date(),
+      });
+
+      console.log(
+        "Student saved to DB with ID:",
+        newStudent.getDataValue("id"),
+      );
+      console.log("Saved student data:", newStudent.toJSON());
+
+      res.status(201).json({
+        success: true,
+        msg: "Student created successfully",
+        data: {
+          student: newStudent, //has id, createdAt, updatedAt
+          createdBy: {
+            id: user.id,
+            email: user.email,
+          },
         },
-      },
-    });
+      });
+    } catch (error: any) {
+      console.error("Error creating student:", error);
+
+      // Handle specific errors
+      if (error.name === "SequelizeUniqueConstraintError") {
+        return res.status(409).json({
+          success: false,
+          msg: "Email already exists",
+        });
+      }
+
+      if (error.name === "SequelizeValidationError") {
+        return res.status(400).json({
+          success: false,
+          msg: "Validation error",
+          errors: error.errors.map((e: any) => e.message),
+        });
+      }
+
+      res.status(500).json({
+        success: false,
+        msg: "Error creating student",
+        error: error.message,
+      });
+    }
   },
 );
 

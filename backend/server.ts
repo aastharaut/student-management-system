@@ -19,7 +19,6 @@ app.use("/api", studentRoutes); // For /api/students
 app.get("/", (req: Request, res: Response) => {
   res.send("Hello, World!");
 });
-
 app.use(resourceNotFoundHandler);
 app.use(errorHandler);
 

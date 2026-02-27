@@ -10,7 +10,8 @@ interface StudentData {
 }
 
 interface RegisterData {
-  username: string;
+  firstName: string;
+  lastName: string;
   email: string;
   password: string;
   role?: "admin" | "teacher" | "viewer";
@@ -61,7 +62,8 @@ const updateStudentSchema = Joi.object<Partial<StudentData>>({
   });
 
 const registerSchema = Joi.object<RegisterData>({
-  username: Joi.string().min(3).max(100).required(),
+  firstName: Joi.string().required(),
+  lastName: Joi.string().required(),
   email: Joi.string().email().required(),
   password: Joi.string().min(6).required(),
   role: Joi.string().valid("admin", "teacher", "viewer").default("viewer"),

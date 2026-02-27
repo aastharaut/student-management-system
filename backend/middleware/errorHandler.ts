@@ -1,4 +1,5 @@
 import { NextFunction, Request, Response } from "express";
+import { JsonWebTokenError } from "jsonwebtoken";
 import {
   ConnectionError,
   DatabaseError,
@@ -35,6 +36,12 @@ function errorHandler(
   if (err instanceof ConnectionError || err instanceof TimeoutError) {
     return res.status(503).send({
       msg: err.message,
+    });
+  }
+
+  if (err instanceof JsonWebTokenError) {
+    return res.status(401).send({
+      msg: "Invalid or expired token",
     });
   }
 

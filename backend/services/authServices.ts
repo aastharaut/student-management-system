@@ -11,8 +11,8 @@ export default {
       firstName: req.body.firstName,
       lastName: req.body.lastName,
       email: req.body.email,
-      isSeller: req.body.isSeller,
       password: hashed,
+      role: req.body.role,
     });
   },
 
