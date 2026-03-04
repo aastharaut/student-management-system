@@ -33,7 +33,6 @@ const Header: React.FC = () => {
     <header className="bg-purple-900 text-white shadow-md">
       <nav className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
-          {/* Logo and Brand */}
           <Link
             to="/"
             className="flex items-center space-x-2 hover:opacity-90 transition-opacity"
@@ -60,7 +59,6 @@ const Header: React.FC = () => {
             <span className="text-lg font-bold font-syne">StudentManage</span>
           </Link>
 
-          {/* Desktop Navigation Links */}
           <div className="hidden md:flex items-center space-x-8">
             {navLinks.map((link) => (
               <Link
@@ -73,7 +71,6 @@ const Header: React.FC = () => {
             ))}
           </div>
 
-          {/* Auth Buttons */}
           <div className="hidden md:flex items-center space-x-3">
             <button
               onClick={handleLogin}
@@ -91,7 +88,6 @@ const Header: React.FC = () => {
             </button>
           </div>
 
-          {/* Mobile Menu Button */}
           <button
             className="md:hidden p-2 rounded-md hover:bg-purple-900 transition-colors"
             onClick={toggleMobileMenu}
@@ -114,7 +110,6 @@ const Header: React.FC = () => {
           </button>
         </div>
 
-        {/* Mobile Menu */}
         {isMobileMenuOpen && (
           <div className="md:hidden py-3 border-t border-purple-900">
             <div className="flex flex-col space-y-2">
