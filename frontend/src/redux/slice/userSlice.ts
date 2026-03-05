@@ -2,19 +2,33 @@ import { createSlice } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
 
 export interface UserState {
-  value: number;
+  value: {
+    data: null | {
+      firstName: string;
+      lastName: string;
+      email: string;
+      role: "admin" | "teacher" | "viewer";
+    };
+  };
 }
 
 const initialState: UserState = {
-  value: 0,
+  value: {
+    data: null,
+  },
 };
 
 export const UserSlice = createSlice({
   name: "user",
   initialState,
   reducers: {
-    login: () => {},
-    logout: () => {},
+    login: (state, action) => {
+      state.value.data = action.payload;
+    },
+    logout: (state) => {
+      state.value.data = null;
+      localStorage.removeItem("authToken"); // Clear user data from localStorage on logout
+    },
   },
 });
 

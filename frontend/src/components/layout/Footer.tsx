@@ -147,7 +147,7 @@ const Footer: React.FC = () => {
                 type="email"
                 name="email"
                 placeholder="Your email"
-                className="px-2 py-1.5 text-xs text-gray-900 rounded-l focus:outline-none flex-grow"
+                className="px-2 py-1.5 text-xs text-gray-900 rounded-l focus:outline-none grow"
                 required
                 aria-label="Email for newsletter"
               />
