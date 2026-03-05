@@ -9,6 +9,9 @@ app.use(express.json());
 import studentRoutes from "./routes/student";
 import "./models/User";
 import "./models/Student";
+import cors from "cors";
+
+app.use(cors());
 
 console.log("JWT_SECRET loaded:", process.env.JWT_SECRET ? "Yes" : "No");
 

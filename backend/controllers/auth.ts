@@ -13,13 +13,13 @@ const authController = {
   },
   login: async (req: Request, res: Response, next: NextFunction) => {
     try {
-      let user = await authService.login(req);
-      if (user) {
-        res.send({ user });
+      const data = await authService.login(req);
+
+      if (data) {
+        const { token, ...user } = data;
+        res.send({ user, token });
       } else {
-        res.status(401).send({
-          msg: "invalid credentials",
-        });
+        res.status(401).send({ msg: "Invalid credentials" });
       }
     } catch (err) {
       next(err);
