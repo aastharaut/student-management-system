@@ -1,9 +1,24 @@
-import { createBrowserRouter, RouterProvider } from "react-router";
+import { createBrowserRouter, Router, RouterProvider } from "react-router";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import RootLayout from "./components/layout/RootLayout";
 import "./index.css";
+import axios from "axios";
+import { useEffect } from "react";
+
+function App() {
+  useEffect(() => {
+    let token = localStorage.getItem("accesstoken");
+    axios.get("http://localhost:3000/api/protected", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+  }, []);
+
+  return <RouterProvider router={router} />;
+}
 
 const router = createBrowserRouter([
   {
@@ -18,9 +33,5 @@ const router = createBrowserRouter([
     ],
   },
 ]);
-
-function App() {
-  return <RouterProvider router={router} />;
-}
 
 export default App;
