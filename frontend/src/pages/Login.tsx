@@ -17,7 +17,7 @@ export default function LoginPage() {
 
     const form = e.currentTarget;
     api
-      .post("/auth/login", {
+      .post("/api/login", {
         email: (form.elements.namedItem("email") as HTMLInputElement).value,
         password: (form.elements.namedItem("password") as HTMLInputElement)
           .value,

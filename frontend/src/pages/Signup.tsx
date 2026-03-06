@@ -26,7 +26,7 @@ export default function SignupPage() {
 
     const form = e.currentTarget;
     api
-      .post("/auth/signup", {
+      .post("/api/signup", {
         email: (form.elements.namedItem("email") as HTMLInputElement).value,
         password: (form.elements.namedItem("password") as HTMLInputElement)
           .value,
@@ -69,11 +69,7 @@ export default function SignupPage() {
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-purple-500"
               required
             />
-            {errors.find((el) => el.field === "firstName")?.message && (
-              <p className="text-red-500 text-sm mt-1">
-                {errors.find((el) => el.field === "firstName")?.message}
-              </p>
-            )}
+            {errors?.find((el) => el.field === "firstName")?.message}
           </div>
 
           <div className="mb-6">
@@ -85,11 +81,7 @@ export default function SignupPage() {
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-purple-500"
               required
             />
-            {errors.find((el) => el.field === "lastName")?.message && (
-              <p className="text-red-500 text-sm mt-1">
-                {errors.find((el) => el.field === "lastName")?.message}
-              </p>
-            )}
+            {errors?.find((el) => el.field === "lastName")?.message}
           </div>
 
           <div className="mb-4">
