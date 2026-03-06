@@ -1,4 +1,4 @@
-import axios from "axios";
+import api from "../api/api";
 import BreadCrumb from "../components/ui/BreadCrumb";
 import type { FormEvent } from "react";
 import notify from "../helpers/notify";
@@ -6,21 +6,35 @@ import { useNavigate } from "react-router";
 import { ToastContainer } from "react-toastify";
 import { login } from "../redux/slice/userSlice";
 import { useDispatch } from "react-redux";
+import { useState } from "react";
+import { ROLES } from "../constants/role";
 
 export default function SignupPage() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+
+  interface ValidationError {
+    field: string;
+    message: string;
+  }
+
+  const [errors, setErrors] = useState<ValidationError[]>([]);
 
   const handleSignup = (e: FormEvent<HTMLFormElement>) => {
     console.log("Signup form submitted");
     e.preventDefault();
 
     const form = e.currentTarget;
-    axios
+    api
       .post("/auth/signup", {
         email: (form.elements.namedItem("email") as HTMLInputElement).value,
         password: (form.elements.namedItem("password") as HTMLInputElement)
           .value,
+        firstName: (form.elements.namedItem("firstName") as HTMLInputElement)
+          .value,
+        lastName: (form.elements.namedItem("lastName") as HTMLInputElement)
+          .value,
+        role: (form.elements.namedItem("role") as HTMLInputElement).value,
       })
       .then((res) => {
         console.log(res.data);
@@ -31,6 +45,9 @@ export default function SignupPage() {
       })
       .catch((err) => {
         notify.error(err.response.data.msg);
+
+        setErrors(err.response.data.errors);
+        console.log(err.response.data.errors);
       });
   };
 
@@ -43,6 +60,38 @@ export default function SignupPage() {
         <h2 className="text-2xl font-bold mb-6 text-center">Create Account</h2>
 
         <form onSubmit={handleSignup}>
+          <div className="mb-4">
+            <label className="block text-gray-700 text-sm font-bold mb-2">
+              First Name
+            </label>
+            <input
+              name="firstName"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-purple-500"
+              required
+            />
+            {errors.find((el) => el.field === "firstName")?.message && (
+              <p className="text-red-500 text-sm mt-1">
+                {errors.find((el) => el.field === "firstName")?.message}
+              </p>
+            )}
+          </div>
+
+          <div className="mb-6">
+            <label className="block text-gray-700 text-sm font-bold mb-2">
+              Last Name
+            </label>
+            <input
+              name="lastName"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-purple-500"
+              required
+            />
+            {errors.find((el) => el.field === "lastName")?.message && (
+              <p className="text-red-500 text-sm mt-1">
+                {errors.find((el) => el.field === "lastName")?.message}
+              </p>
+            )}
+          </div>
+
           <div className="mb-4">
             <label className="block text-gray-700 text-sm font-bold mb-2">
               Email
@@ -67,11 +116,45 @@ export default function SignupPage() {
             />
           </div>
 
+          <div className="mb-6">
+            <label className="block text-gray-700 text-sm font-bold mb-2">
+              Confirm Password
+            </label>
+            <input
+              type="password"
+              name="confirmPassword"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-purple-500"
+              required
+            />
+          </div>
+          <div className="mb-4">
+            <label className="block text-gray-700 font-medium mb-2">
+              Select Role
+            </label>
+
+            <div className="flex gap-6">
+              <label className="flex items-center gap-2">
+                <input type="radio" name="role" value={ROLES.ADMIN} required />
+                Admin
+              </label>
+
+              <label className="flex items-center gap-2">
+                <input type="radio" name="role" value={ROLES.TEACHER} />
+                Teacher
+              </label>
+
+              <label className="flex items-center gap-2">
+                <input type="radio" name="role" value={ROLES.VIEWER} />
+                Viewer
+              </label>
+            </div>
+          </div>
+
           <button
             type="submit"
             className="w-full bg-purple-900 text-white py-2 rounded-lg hover:bg-purple-700 transition-colors"
           >
-            Sign In
+            Sign Up
           </button>
         </form>
 

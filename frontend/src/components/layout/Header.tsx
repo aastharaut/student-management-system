@@ -1,12 +1,15 @@
+// components/layout/Header.tsx
+import React from "react";
 import { Link } from "react-router";
 import { useSelector, useDispatch } from "react-redux";
 import type { RootState } from "../../redux/store";
 import { logout } from "../../redux/slice/userSlice";
-import { LogOut, User, Bell, Settings } from "lucide-react";
+import { LogOut, User, Bell, Settings, UserPlus } from "lucide-react";
 import Navbar from "../ui/NavBar";
 
 function Header() {
-  const user = useSelector((state: RootState) => state.user);
+  // Access user data correctly based on your slice structure
+  const user = useSelector((state: RootState) => state.user.value.data);
   const dispatch = useDispatch();
 
   const handleLogout = (): void => {
@@ -30,7 +33,7 @@ function Header() {
 
             {/* Right side - User actions */}
             <div className="flex items-center space-x-4">
-              {user?.firstName ? (
+              {user ? (
                 <>
                   <button className="hover:text-purple-200 transition-colors">
                     <Bell size={18} />
@@ -47,13 +50,22 @@ function Header() {
                   </button>
                 </>
               ) : (
-                <Link
-                  to="/login"
-                  className="flex items-center space-x-1 text-sm hover:text-purple-200 transition-colors"
-                >
-                  <User size={18} />
-                  <span>Login</span>
-                </Link>
+                <div className="flex items-center space-x-3">
+                  <Link
+                    to="/login"
+                    className="flex items-center space-x-1 text-sm hover:text-purple-200 transition-colors"
+                  >
+                    <User size={18} />
+                    <span>Login</span>
+                  </Link>
+                  <Link
+                    to="/signup"
+                    className="flex items-center space-x-1 text-sm hover:text-purple-200 transition-colors border-l border-purple-700 pl-3"
+                  >
+                    <UserPlus size={18} />
+                    <span>Sign Up</span>
+                  </Link>
+                </div>
               )}
             </div>
           </div>

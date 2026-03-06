@@ -16,11 +16,11 @@ const router = createBrowserRouter([
       { path: "/signup", Component: Signup },
       {
         path: "/admin",
-        element: <ProtectedRoute />, // ← Use 'element' not 'Component'
+        element: <ProtectedRoute />,
         children: [
           {
             path: "dashboard",
-            element: <Dashboard />, // ← Use 'element' here too
+            element: <Dashboard />,
           },
         ],
       },

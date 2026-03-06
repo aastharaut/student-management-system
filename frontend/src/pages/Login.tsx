@@ -1,4 +1,4 @@
-import axios from "axios";
+import api from "../api/api";
 import BreadCrumb from "../components/ui/BreadCrumb";
 import type { FormEvent } from "react";
 import notify from "../helpers/notify";
@@ -12,11 +12,11 @@ export default function LoginPage() {
   const dispatch = useDispatch();
 
   const handleLogin = (e: FormEvent<HTMLFormElement>) => {
-    console.log("here");
+    console.log("Login form submitted");
     e.preventDefault();
 
     const form = e.currentTarget;
-    axios
+    api
       .post("/auth/login", {
         email: (form.elements.namedItem("email") as HTMLInputElement).value,
         password: (form.elements.namedItem("password") as HTMLInputElement)

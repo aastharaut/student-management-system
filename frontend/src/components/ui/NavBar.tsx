@@ -1,22 +1,39 @@
 // components/navigation/Navbar.tsx
-import { useState } from "react";
+import React, { useState } from "react";
 import { Link, NavLink } from "react-router";
 import { Menu, X } from "lucide-react";
+import { useSelector } from "react-redux";
+import type { RootState } from "../../redux/store";
 
 interface NavLink {
   path: string;
   label: string;
+  requiresAuth?: boolean;
+  roles?: string[];
 }
 
 function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState<boolean>(false);
+  const user = useSelector((state: RootState) => state.user.value.data);
 
   const navLinks: NavLink[] = [
     { path: "/", label: "Home" },
     { path: "/students", label: "Students" },
     { path: "/about", label: "About" },
-    { path: "/admin", label: "Admin Dashboard" },
+    {
+      path: "/admin",
+      label: "Admin Dashboard",
+      requiresAuth: true,
+      roles: ["admin"],
+    },
   ];
+
+  // Filter links based on user role
+  const filteredLinks = navLinks.filter((link) => {
+    if (link.requiresAuth && !user) return false;
+    if (link.roles && user && !link.roles.includes(user.role)) return false;
+    return true;
+  });
 
   const toggleMobileMenu = (): void => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
@@ -57,7 +74,7 @@ function Navbar() {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
-            {navLinks.map((link) => (
+            {filteredLinks.map((link) => (
               <NavLink
                 key={link.path}
                 to={link.path}
@@ -92,7 +109,7 @@ function Navbar() {
         {isMobileMenuOpen && (
           <div className="md:hidden py-3 border-t border-gray-200">
             <div className="flex flex-col space-y-2">
-              {navLinks.map((link) => (
+              {filteredLinks.map((link) => (
                 <NavLink
                   key={link.path}
                   to={link.path}
