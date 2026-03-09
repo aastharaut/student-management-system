@@ -6,7 +6,7 @@ interface StudentData {
   email: string;
   age: number;
   course: string;
-  enrollmentDate?: Date;
+  enrollmentDate?: string;
 }
 
 interface RegisterData {
@@ -14,7 +14,7 @@ interface RegisterData {
   lastName: string;
   email: string;
   password: string;
-  role?: "admin" | "teacher" | "viewer";
+  role?: "admin" | "teacher" | "student";
 }
 
 interface LoginData {
@@ -66,7 +66,7 @@ const registerSchema = Joi.object<RegisterData>({
   lastName: Joi.string().required(),
   email: Joi.string().email().required(),
   password: Joi.string().min(6).required(),
-  role: Joi.string().valid("admin", "teacher", "viewer").default("viewer"),
+  role: Joi.string().valid("admin", "teacher", "student").default("admin"),
 });
 
 const loginSchema = Joi.object<LoginData>({

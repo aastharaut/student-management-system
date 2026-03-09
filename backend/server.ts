@@ -3,14 +3,13 @@ import "./connections/database";
 import appRoutes from "./routes/auth";
 import resourceNotFoundHandler from "./middleware/resourceNotFoundHandler";
 import errorHandler from "./middleware/errorHandler";
-import "dotenv/config";
-const app = express();
-app.use(express.json());
 import studentRoutes from "./routes/student";
 import "./models/User";
 import "./models/Student";
 import cors from "cors";
-
+import "dotenv/config";
+const app = express();
+app.use(express.json());
 app.use(cors());
 
 console.log("JWT_SECRET loaded:", process.env.JWT_SECRET ? "Yes" : "No");

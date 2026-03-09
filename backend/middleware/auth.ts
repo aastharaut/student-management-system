@@ -32,7 +32,6 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 
-// Extend Express Request type to include user
 declare global {
   namespace Express {
     interface Request {
@@ -94,7 +93,6 @@ export const checkAuthentication = (
     // Proceed to next middleware/route handler
     next();
   } catch (error) {
-    // Handle different JWT errors
     if (error instanceof jwt.JsonWebTokenError) {
       return res.status(401).json({
         success: false,
@@ -109,7 +107,6 @@ export const checkAuthentication = (
       });
     }
 
-    // Handle other errors
     console.error("Authentication error:", error);
     return res.status(500).json({
       success: false,

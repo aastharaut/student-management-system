@@ -76,31 +76,6 @@ router.get("/students", (req: Request, res: Response) => {
   });
 });
 
-// // Create a new student with validation
-// router.post(
-//   "/students",
-//   validateStudent,
-//   async (req: Request, res: Response) => {
-//     const user = (req as any).user;
-//     const studentData = (req as unknown as ValidatedRequest<StudentData>)
-//       .validatedBody;
-
-//     console.log("Creating student:", studentData);
-//     console.log("Created by user:", user);
-
-//     res.status(201).json({
-//       success: true,
-//       msg: "Student created successfully",
-//       data: {
-//         student: studentData,
-//         createdBy: {
-//           id: user.id,
-//           email: user.email,
-//         },
-//       },
-//     });
-//   },
-// );
 router.post(
   "/students",
   validateStudent,

@@ -1,4 +1,4 @@
-import { DataTypes } from "sequelize";
+import { DataTypes, Optional } from "sequelize";
 import sequelize from "../connections/database";
 
 const Student = sequelize.define(
