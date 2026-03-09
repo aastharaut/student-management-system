@@ -1,8 +1,6 @@
 import { DataTypes } from "sequelize";
 import sequelize from "../connections/database";
 import { ROLES } from "../constants/role";
-import bcrypt from "bcrypt";
-import { STATUS } from "../constants/status";
 
 const User = sequelize.define(
   "User",
@@ -27,14 +25,29 @@ const User = sequelize.define(
       type: DataTypes.STRING,
       allowNull: false,
     },
+    age: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      validate: {
+        min: 10,
+        max: 100,
+      },
+    },
+    course: {
+      type: DataTypes.STRING(255),
+      allowNull: false,
+      validate: {
+        notEmpty: true,
+      },
+    },
+    profilePicture: {
+      type: DataTypes.STRING(500),
+      allowNull: true,
+      field: "profile_picture",
+    },
     role: {
       type: DataTypes.ENUM(ROLES.ADMIN, ROLES.STUDENT),
       defaultValue: ROLES.ADMIN,
-      allowNull: false,
-    },
-    status: {
-      type: DataTypes.ENUM(STATUS.ACTIVE, STATUS.INACTIVE, STATUS.REJECTED),
-      defaultValue: STATUS.INACTIVE, //login bhayesi inactive hunxa, admin le active garna parxa
       allowNull: false,
     },
   },

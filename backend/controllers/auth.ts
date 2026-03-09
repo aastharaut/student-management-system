@@ -2,38 +2,32 @@ import { Request, Response, NextFunction } from "express";
 import authService from "../services/authServices";
 
 const authController = {
-  signup: async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      let user = await authService.signup(req);
-      console.log({ user });
-      res.send(user);
-    } catch (err) {
-      next(err);
-    }
-  },
   login: async (req: Request, res: Response, next: NextFunction) => {
     try {
       const data = await authService.login(req);
 
       if (data) {
-        const { token, ...user } = data;
-        res.send({ user, token });
+        const { token, user } = data;
+        res.json({ success: true, user, token });
       } else {
-        res.status(401).send({ msg: "Invalid credentials" });
+        res.status(401).json({
+          success: false,
+          msg: "Invalid credentials or account not approved yet",
+        });
       }
-    } catch (err) {
+    } catch (err: any) {
       next(err);
     }
   },
+
   getUser: async (req: Request, res: Response, next: NextFunction) => {
     try {
-      res.send({
-        // @ts-ignore
-        data: req.user,
-      });
-    } catch (err) {
+      // @ts-ignore
+      res.json({ success: true, data: req.user });
+    } catch (err: any) {
       next(err);
     }
   },
 };
+
 export default authController;
