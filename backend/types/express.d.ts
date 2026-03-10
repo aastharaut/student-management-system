@@ -1,19 +1,11 @@
 import { Request } from "express";
 
-declare global {
-  namespace Express {
-    interface Request {
-      validatedBody?: any;
-    }
-  }
-}
-import { StudentData } from "../middleware/validation";
-
-declare global {
-  namespace Express {
-    interface Request {
-      validatedBody?: StudentData;
-      user?: any;
-    }
-  }
+export interface AuthRequest extends Request {
+  user: {
+    id: number;
+    email: string;
+    roles: string;
+    firstName: string;
+    lastName: string;
+  };
 }
