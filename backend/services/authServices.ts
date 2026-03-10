@@ -1,66 +1,89 @@
+// import { Request } from "express";
+// import bcrypt from "bcrypt";
+// import jsonwebtoken from "jsonwebtoken";
+// import User from "../models/User";
+
+// export default {
+//   login: async (req: Request) => {
+//     // Find user by email
+//     const user = await User.findOne({ where: { email: req.body.email } });
+//     if (!user) return false;
+
+//     const userData = user.toJSON();
+
+//     // Compare passwords
+//     const passwordMatched = await bcrypt.compare(
+//       req.body.password,
+//       userData.password,
+//     );
+//     if (!passwordMatched) return false;
+
+//     // Remove sensitive fields
+//     delete userData.password;
+//     delete userData.createdAt;
+//     delete userData.updatedAt;
+
+//     // Generate JWT
+//     const token = jsonwebtoken.sign(
+//       {
+//         id: userData.id,
+//         email: userData.email,
+//         roles: userData.roles,
+//       },
+//       process.env.JWT_SECRET || "",
+//       { expiresIn: "7d" },
+//     );
+
+//     console.log("Token generated:", token);
+
+//     return {
+//       ...userData,
+//       token,
+//     };
+//   },
+// };
+
 import { Request } from "express";
 import bcrypt from "bcrypt";
-import jsonwebtoken from "jsonwebtoken";
-
+import jwt from "jsonwebtoken";
 import User from "../models/User";
 
+interface UserData {
+  id: number;
+  email: string;
+  password: string;
+  roles: string;
+}
+
 export default {
-  requestSignup: async (req: Request) => {
-    let hashed = await bcrypt.hash(req.body.password, 10);
-    return await User.create({
-      firstName: req.body.firstName,
-      lastName: req.body.lastName,
-      email: req.body.email,
-      password: hashed,
-      role: req.body.role,
-    });
-  },
-
   login: async (req: Request) => {
-    // Find user by email
-    let user = await User.findOne({
-      where: {
-        email: req.body.email,
+    const { email, password } = req.body;
+
+    const user = await User.findOne({ where: { email } });
+    if (!user) return false;
+
+    const userData = user.toJSON() as UserData;
+
+    const passwordMatched = await bcrypt.compare(password, userData.password);
+    if (!passwordMatched) return false;
+
+    delete (userData as any).password;
+
+    const token = jwt.sign(
+      {
+        id: userData.id,
+        email: userData.email,
+        roles: userData.roles, // "admin" or "student"
       },
-    });
+      process.env.JWT_SECRET || "",
+      { expiresIn: "7d" },
+    );
 
-    if (user) {
-      let userData = user.toJSON();
+    console.log("Token generated:", token);
 
-      // Compare passwords
-      let passwordMatched = await bcrypt.compare(
-        req.body.password,
-        userData.password,
-      );
-
-      if (!passwordMatched) {
-        return false;
-      }
-      delete userData.password;
-      delete userData.createdAt;
-      delete userData.updatedAt;
-
-      //jwt token
-      let token = jsonwebtoken.sign(
-        {
-          id: userData.id,
-          email: userData.email,
-          role: userData.role,
-        },
-        process.env.JWT_SECRET || "",
-        {
-          expiresIn: "1h",
-        },
-      );
-
-      console.log("Token generated:", token);
-
-      return {
-        ...userData,
-        token,
-      };
-    }
-
-    return false;
+    return {
+      ...userData,
+      token,
+    };
   },
 };

@@ -7,12 +7,13 @@ const authController = {
       const data = await authService.login(req);
 
       if (data) {
-        const { token, user } = data;
+        // All user fields are in data except token
+        const { token, ...user } = data;
         res.json({ success: true, user, token });
       } else {
         res.status(401).json({
           success: false,
-          msg: "Invalid credentials or account not approved yet",
+          msg: "Invalid credentials",
         });
       }
     } catch (err: any) {

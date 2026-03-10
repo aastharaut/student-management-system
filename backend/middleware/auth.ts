@@ -1,33 +1,82 @@
-import { Router, Request, Response, NextFunction } from "express";
-import jsonwebtoken from "jsonwebtoken";
+import { Request, Response, NextFunction } from "express";
+import jwt from "jsonwebtoken";
 
 export const checkAuthentication = (
-  req: Request,
+  req: any,
   res: Response,
   next: NextFunction,
 ) => {
-  let loggedIn = false;
+  const authHeader = req.headers.authorization;
+  if (!authHeader) return res.status(401).json({ msg: "No token provided" });
 
-  if (req.headers.authorization) {
-    let token = req.headers.authorization.split(" ")[1]; // Bearer token splitting
-    console.log("Token received in middleware:", token);
-
-    if (token) {
-      let tokenValid = jsonwebtoken.verify(token, process.env.JWT_SECRET || "");
-      if (tokenValid) {
-        loggedIn = true;
-      }
-    }
-  }
-
-  if (loggedIn) {
+  const token = authHeader.split(" ")[1]; // Bearer <token>
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || "");
+    req.user = decoded; // attach decoded JWT to req.user
     next();
-  } else {
-    res.status(401).json({
-      msg: "Unauthenticated access denied",
-    });
+  } catch (err) {
+    return res.status(401).json({ msg: "Invalid token" });
   }
 };
+
+// import { Router, Request, Response, NextFunction } from "express";
+// import jsonwebtoken from "jsonwebtoken";
+
+// export const checkAuthentication = (
+//   req: Request,
+//   res: Response,
+//   next: NextFunction,
+// ) => {
+//   let loggedIn = false;
+
+//   if (req.headers.authorization) {
+//     let token = req.headers.authorization.split(" ")[1]; // Bearer token splitting
+//     console.log("Token received in middleware:", token);
+
+//     if (token) {
+//       let tokenValid = jsonwebtoken.verify(token, process.env.JWT_SECRET || "");
+//       if (tokenValid) {
+//         loggedIn = true;
+//       }
+//     }
+//   }
+
+//   if (loggedIn) {
+//     next();
+//   } else {
+//     res.status(401).json({
+//       msg: "Unauthenticated access denied",
+//     });
+//   }
+// };
+
+// middleware/auth.ts
+// import jwt from "jsonwebtoken";
+
+// export const checkAuthentication = (req: any, res: any, next: any) => {
+//   const authHeader = req.headers.authorization;
+//   if (!authHeader?.startsWith("Bearer ")) {
+//     return res.status(401).json({ success: false, msg: "No token provided" });
+//   }
+
+//   const token = authHeader.split(" ")[1];
+
+//   try {
+//     const decoded = jwt.verify(token, process.env.JWT_SECRET || "") as any;
+
+//     // Attach full user object (or at least id + role)
+//     req.user = {
+//       id: decoded.id,
+//       email: decoded.email,
+//       role: decoded.role, // <--- make sure your token includes this
+//     };
+
+//     console.log("Token received in middleware:", token);
+//     next();
+//   } catch (error) {
+//     return res.status(401).json({ success: false, msg: "Invalid token" });
+//   }
+// };
 
 // middleware/auth.ts
 // import { Request, Response, NextFunction } from "express";
