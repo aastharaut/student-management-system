@@ -160,6 +160,7 @@ function Navbar({ onLogout }: NavbarProps) {
 
   const navLinks: NavItem[] = [
     { path: "/", label: "Home" },
+    { path: "/me", label: "Profile", requiresAuth: true },
     {
       path: "/admin/dashboard",
       label: "Dashboard",
@@ -172,12 +173,12 @@ function Navbar({ onLogout }: NavbarProps) {
       requiresAuth: true,
       roles: ["admin"],
     },
-    {
-      path: "/admin/create-student",
-      label: "Add Student",
-      requiresAuth: true,
-      roles: ["admin"],
-    },
+    // {
+    //   path: "/admin/create-student",
+    //   label: "Add Student",
+    //   requiresAuth: true,
+    //   roles: ["admin"],
+    // },
   ];
 
   const filteredLinks = navLinks.filter((link) => {

@@ -5,8 +5,8 @@ import RootLayout from "../components/layout/RootLayout";
 import ProtectedRoute from "../components/ui/ProtectedRoute";
 import Dashboard from "../pages/admin/Dashboard";
 import Students from "../pages/admin/Students";
-import CreateStudent from "../pages/admin/CreateStudent";
 import Profile from "../pages/Profile";
+import CreateStudent from "../pages/admin/CreateStudent";
 
 const router = createBrowserRouter([
   {
@@ -29,10 +29,10 @@ const router = createBrowserRouter([
             path: "students",
             element: <Students />,
           },
-          {
-            path: "create-student",
-            element: <CreateStudent />,
-          },
+          // {
+          //   path: "create-student",
+          //   element: <CreateStudent />,
+          // },
         ],
       },
     ],

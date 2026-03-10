@@ -117,8 +117,8 @@ export default function LoginPage() {
           .value,
       })
       .then((res) => {
-        dispatch(login(res.data.user)); // ✅ pass only the user object, not the whole response
-        localStorage.setItem("token", res.data.token); // ✅ consistent key name ("token")
+        dispatch(login(res.data.user));
+        localStorage.setItem("token", res.data.token);
         notify.success("Login successful");
         navigate("/");
       })
