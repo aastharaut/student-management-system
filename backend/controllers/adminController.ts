@@ -29,7 +29,7 @@ const adminController = {
         email,
         age,
         course,
-        password: password, // hash in service or middleware
+        password: password, // hash in model
         roles: "student",
       });
 
@@ -44,12 +44,31 @@ const adminController = {
     }
   },
 
+  getStudentById: async (req: Request, res: Response) => {
+    try {
+      const id = Number(req.params.id);
+
+      const student = await User.findByPk(id);
+
+      if (!student) {
+        return res.status(404).json({
+          msg: "Student not found",
+        });
+      }
+
+      res.json(student);
+    } catch (error) {
+      res.status(500).json({
+        msg: "Error fetching student",
+      });
+    }
+  },
   // Update student
   updateStudent: async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { id } = req.params;
 
-      const student = await User.findOne({ where: { id, role: "student" } });
+      const student = await User.findOne({ where: { id, roles: "student" } });
       if (!student)
         return res
           .status(404)
@@ -67,7 +86,7 @@ const adminController = {
     try {
       const { id } = req.params;
 
-      const student = await User.findOne({ where: { id, role: "student" } });
+      const student = await User.findOne({ where: { id, roles: "student" } });
       if (!student)
         return res
           .status(404)
