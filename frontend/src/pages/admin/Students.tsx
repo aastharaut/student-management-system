@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import { useNavigate } from "react-router";
+import api from "../../api/api";
 import AddStudentModal from "./CreateStudent";
 
 interface Student {
@@ -9,46 +10,28 @@ interface Student {
   email: string;
   age: number;
   course: string;
+  profilePicture?: string;
 }
 
 export default function Students() {
   const [students, setStudents] = useState<Student[]>([]);
   const [showModal, setShowModal] = useState(false);
+  const navigate = useNavigate();
 
   const fetchStudents = () => {
-    const token = localStorage.getItem("accessToken");
-    axios
-      .get(`${import.meta.env.VITE_SERVER_URL}/students`, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      .then((res) => {
-        // assuming your backend returns { data: [...] }
-        setStudents(res.data.data || []);
-      })
-      .catch((err) => {
-        console.error("Error fetching students:", err);
-      });
+    api
+      .get("/api/admin/students")
+      .then((res) => setStudents(res.data.data || []))
+      .catch((err) => console.error("Error fetching students:", err));
   };
 
   useEffect(() => {
     fetchStudents();
   }, []);
 
-  const handleDelete = (id: number) => {
-    if (!confirm("Are you sure you want to delete this student?")) return;
-
-    const token = localStorage.getItem("accessToken");
-    axios
-      .delete(`${import.meta.env.VITE_SERVER_URL}/students/${id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      .then(() => fetchStudents())
-      .catch((err) => console.error("Error deleting student:", err));
-  };
-
   return (
     <div className="container p-4">
-      <div className="flex justify-between items-center mb-4">
+      <div className="flex justify-between items-center mb-6">
         <h1 className="text-xl font-bold">Students</h1>
         <button
           onClick={() => setShowModal(true)}
@@ -58,24 +41,51 @@ export default function Students() {
         </button>
       </div>
 
-      <ul className="border rounded p-2">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {students.map((s) => (
-          <li
+          <div
             key={s.id}
-            className="flex justify-between items-center p-2 border-b last:border-b-0"
+            onClick={() => navigate(`/admin/students/${s.id}`)}
+            className="bg-white border rounded-lg p-4 flex items-center gap-4 shadow-sm cursor-pointer hover:shadow-md transition-shadow"
           >
-            <span>
-              {s.firstName} {s.lastName} - {s.course}
-            </span>
-            <button
-              onClick={() => handleDelete(s.id)}
-              className="bg-red-500 text-white px-2 py-1 rounded"
-            >
-              Delete
-            </button>
-          </li>
+            {/* Profile Picture */}
+            <div className="w-14 h-14 rounded-full overflow-hidden bg-gray-100 flex-shrink-0 flex items-center justify-center">
+              {s.profilePicture ? (
+                <img
+                  src={`${import.meta.env.VITE_SERVER_URL}${s.profilePicture}`}
+                  alt={`${s.firstName} ${s.lastName}`}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <span className="text-xl font-semibold text-gray-400">
+                  {s.firstName[0]}
+                  {s.lastName[0]}
+                </span>
+              )}
+            </div>
+
+            {/* Info */}
+            <div className="flex-1 min-w-0">
+              <p className="font-semibold truncate">
+                {s.firstName} {s.lastName}
+              </p>
+              <p className="text-sm text-gray-500 truncate">{s.email}</p>
+              <div className="flex gap-3 mt-1 text-xs text-gray-400">
+                <span>{s.course}</span>
+                <span>Age {s.age}</span>
+              </div>
+            </div>
+
+            <span className="text-gray-300 text-lg">›</span>
+          </div>
         ))}
-      </ul>
+
+        {students.length === 0 && (
+          <p className="text-gray-400 col-span-3 text-center py-8">
+            No students yet. Add one to get started.
+          </p>
+        )}
+      </div>
 
       {showModal && (
         <AddStudentModal

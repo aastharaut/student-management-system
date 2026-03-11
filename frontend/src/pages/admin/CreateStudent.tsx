@@ -33,7 +33,6 @@ export default function AddStudentModal({ onClose, onSaved }: Props) {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Bug fix 1: use FormData so the image file can be sent
     const formData = new FormData();
     formData.append("firstName", form.firstName);
     formData.append("lastName", form.lastName);
@@ -45,9 +44,8 @@ export default function AddStudentModal({ onClose, onSaved }: Props) {
       formData.append("profilePicture", profilePicture);
     }
 
-    // Bug fix 2: use api directly (no manual token or baseURL — interceptor handles it)
     api
-      .post("/students", formData)
+      .post("/api/admin/students", formData)
       .then(() => {
         onSaved();
         onClose();

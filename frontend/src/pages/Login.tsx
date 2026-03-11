@@ -120,7 +120,15 @@ export default function LoginPage() {
         dispatch(login(res.data.user));
         localStorage.setItem("token", res.data.token);
         notify.success("Login successful");
-        navigate("/");
+        //navigate("/");
+        const role = res.data.user.roles;
+        if (role === "admin") {
+          navigate("/");
+        } else if (role === "student") {
+          navigate("/student/profile");
+        } else {
+          navigate("/");
+        }
       })
       .catch((err) => {
         notify.error(err.response.data.msg);

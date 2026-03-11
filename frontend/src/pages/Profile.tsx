@@ -1,11 +1,11 @@
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router";
 import { useState } from "react";
-import axios from "axios";
 import type { RootState } from "../redux/store";
 import { User as UserIcon, Mail, Shield, ArrowLeft } from "lucide-react";
 import BreadCrumb from "../components/ui/BreadCrumb";
 import type { User } from "../types/user";
+import api from "../api/api";
 
 export default function ProfilePage() {
   const user = useSelector((state: RootState) => state.user.value.data);
@@ -38,11 +38,11 @@ export default function ProfilePage() {
   const handleSave = async () => {
     try {
       if (user.roles === "student") {
-        await axios.put("/student/me", {
+        await api.put("api/me", {
           profilePicture: formData.profilePicture,
         });
       } else {
-        await axios.put("/admin/profile", formData);
+        await api.put("api/me", formData);
       }
 
       alert("Profile updated!");

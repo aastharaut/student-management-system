@@ -6,7 +6,7 @@ import ProtectedRoute from "../components/ui/ProtectedRoute";
 import Dashboard from "../pages/admin/Dashboard";
 import Students from "../pages/admin/Students";
 import Profile from "../pages/Profile";
-import CreateStudent from "../pages/admin/CreateStudent";
+import StudentDetail from "../pages/admin/StudentDetails";
 
 const router = createBrowserRouter([
   {
@@ -15,25 +15,23 @@ const router = createBrowserRouter([
     children: [
       { path: "/", element: <Home /> },
       { path: "/login", element: <Login /> },
-      { path: "/me", element: <Profile /> },
 
+      //Admin protected routes
       {
         path: "/admin",
-        element: <ProtectedRoute />,
+        element: <ProtectedRoute allowedRole="admin" />,
         children: [
-          {
-            path: "dashboard",
-            element: <Dashboard />,
-          },
-          {
-            path: "students",
-            element: <Students />,
-          },
-          // {
-          //   path: "create-student",
-          //   element: <CreateStudent />,
-          // },
+          { path: "dashboard", element: <Dashboard /> },
+          { path: "students", element: <Students /> },
+          { path: "students/:id", element: <StudentDetail /> },
+          { path: "profile", element: <Profile /> },
         ],
+      },
+      //Student protected routes
+      {
+        path: "/student",
+        element: <ProtectedRoute allowedRole="student" />,
+        children: [{ path: "profile", element: <Profile /> }],
       },
     ],
   },

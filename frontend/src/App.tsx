@@ -9,15 +9,13 @@ function App() {
   const [isloading, setIsLoading] = useState(true);
   const dispatch = useDispatch();
   useEffect(() => {
-    let token = localStorage.getItem("accesstoken");
+    let token = localStorage.getItem("token");
     axios
-      .get("http://localhost:3000/api/protected", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+      .get("http://localhost:3000/api/me", {
+        headers: { Authorization: `Bearer ${token}` },
       })
       .then((res) => {
-        dispatch(login(res.data));
+        dispatch(login(res.data.data)); //backend returns { success, data: user }
         setIsLoading(false);
       })
       .catch((err) => {
@@ -28,14 +26,14 @@ function App() {
 
   return (
     <>
-    {isloading ? (
-      <p> Loading... </p>
-    ) : (
-      <>
-      <ToastContainer />
-      <Route />
-      </>
-    )}
+      {isloading ? (
+        <p> Loading... </p>
+      ) : (
+        <>
+          <ToastContainer />
+          <Route />
+        </>
+      )}
     </>
   );
 }
