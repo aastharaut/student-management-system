@@ -2,18 +2,25 @@ import { useSelector } from "react-redux";
 import { useNavigate } from "react-router";
 import { useState } from "react";
 import type { RootState } from "../redux/store";
-import { User as UserIcon, Mail, Shield, ArrowLeft } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import BreadCrumb from "../components/ui/BreadCrumb";
-import type { User } from "../types/user";
+import { useDispatch } from "react-redux";
+import { login } from "../redux/slice/userSlice";
+
 import api from "../api/api";
 
 export default function ProfilePage() {
   const user = useSelector((state: RootState) => state.user.value.data);
   const navigate = useNavigate();
-
+  const dispatch = useDispatch();
   const [isEditing, setIsEditing] = useState(false);
-
-  const [formData, setFormData] = useState<Partial<User>>({
+  const [formData, setFormData] = useState<{
+    firstName: string;
+    lastName: string;
+    age: number | undefined;
+    course: string;
+    profilePicture: File | string;
+  }>({
     firstName: user?.firstName || "",
     lastName: user?.lastName || "",
     age: user?.age ?? undefined,
@@ -26,8 +33,6 @@ export default function ProfilePage() {
     return null;
   }
 
-  const initials = `${user.firstName[0]}${user.lastName[0]}`.toUpperCase();
-
   const handleChange = (e: any) => {
     setFormData({
       ...formData,
@@ -35,23 +40,40 @@ export default function ProfilePage() {
     });
   };
 
+  const initials = `${user.firstName[0]}${user.lastName[0]}`.toUpperCase();
+
+  // REPLACE the entire handleSave with this:
   const handleSave = async () => {
     try {
       if (user.roles === "student") {
-        await api.put("api/me", {
-          profilePicture: formData.profilePicture,
-        });
+        const form = new FormData();
+        if (formData.profilePicture instanceof File) {
+          form.append("profilePicture", formData.profilePicture);
+        }
+        await api.put("/api/student/profile", form);
       } else {
-        await api.put("api/me", formData);
+        const form = new FormData();
+        form.append("firstName", formData.firstName);
+        form.append("lastName", formData.lastName);
+        form.append("age", String(formData.age ?? ""));
+        form.append("course", formData.course);
+        if (formData.profilePicture instanceof File) {
+          form.append("profilePicture", formData.profilePicture);
+        }
+        await api.put("/api/admin/profile", form);
       }
+
+      // ✅ Refresh Redux with latest DB data after successful save
+      const updated = await api.get("/api/me");
+      dispatch(login(updated.data.data));
 
       alert("Profile updated!");
       setIsEditing(false);
     } catch (err) {
-      console.error(err);
+      console.error(err); // ✅ only errors land here now
+      alert("Failed to update profile. Please try again.");
     }
   };
-
   return (
     <div className="min-h-screen bg-gray-50">
       <BreadCrumb title="My Profile" />
@@ -129,11 +151,17 @@ export default function ProfilePage() {
 
               {/* Profile Picture */}
               <input
-                name="profilePicture"
-                value={formData.profilePicture}
-                onChange={handleChange}
+                type="file"
+                accept="image/jpeg, image/jpg, image/png"
                 disabled={!isEditing}
-                placeholder="Profile picture URL"
+                onChange={(e) => {
+                  if (e.target.files?.[0]) {
+                    setFormData({
+                      ...formData,
+                      profilePicture: e.target.files[0] as any,
+                    });
+                  }
+                }}
                 className="w-full border p-3 rounded-lg"
               />
             </div>

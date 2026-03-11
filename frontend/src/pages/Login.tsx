@@ -123,7 +123,7 @@ export default function LoginPage() {
         //navigate("/");
         const role = res.data.user.roles;
         if (role === "admin") {
-          navigate("/");
+          navigate("/admin/students");
         } else if (role === "student") {
           navigate("/student/profile");
         } else {
