@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import authService from "../services/authServices";
+import User from "../models/User";
 
 const authController = {
   login: async (req: Request, res: Response, next: NextFunction) => {
@@ -24,7 +25,10 @@ const authController = {
   getUser: async (req: Request, res: Response, next: NextFunction) => {
     try {
       // @ts-ignore
-      res.json({ success: true, data: req.user });
+      const user = await User.findByPk(req.user.id);
+      if (!user)
+        return res.status(404).json({ success: false, msg: "User not found" });
+      res.json({ success: true, data: user });
     } catch (err: any) {
       next(err);
     }
