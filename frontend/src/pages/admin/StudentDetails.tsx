@@ -102,7 +102,7 @@ export default function StudentDetail() {
 
       {/* Profile Header */}
       <div className="flex items-center gap-5 mb-6">
-        <div className="relative w-20 h-20 flex-shrink-0">
+        <div className="relative w-20 h-20 shrink-0">
           <div className="w-20 h-20 rounded-full overflow-hidden bg-gray-100 flex items-center justify-center">
             {avatarUrl ? (
               <img
