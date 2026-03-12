@@ -77,11 +77,11 @@ function Navbar({ onLogout }: NavbarProps) {
               </svg>
             </div>
             <span className="text-base font-bold text-purple-900 font-syne tracking-tight">
-              StudentManage
+              Stuman
             </span>
           </Link>
 
-          {/* Desktop nav — centered */}
+          {/* Desktop nav*/}
           <div className="hidden md:flex absolute left-1/2 -translate-x-1/2 items-center gap-3">
             {filteredLinks.map((link) => (
               <NavLink
@@ -114,7 +114,7 @@ function Navbar({ onLogout }: NavbarProps) {
             <Link to="/" className="flex items-center gap-2.5">
               <div className="w-7 h-7" />
               <span className="text-base font-bold font-syne tracking-tight">
-                StudentManage
+                StuMan
               </span>
             </Link>
           </div>
