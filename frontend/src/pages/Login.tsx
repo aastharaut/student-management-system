@@ -36,6 +36,7 @@ export default function LoginPage() {
       notify.error(err.response?.data?.msg || err.message || "Login failed");
     }
   };
+
   return (
     <div className="min-h-screen bg-gray-50">
       <ToastContainer />
