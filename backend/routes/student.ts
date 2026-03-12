@@ -38,13 +38,18 @@ router.put(
       if (currentUser.roles !== "student") {
         return res.status(403).json({ success: false, msg: "Not allowed" });
       }
-      if (!req.file) {
+      const updates: any = {};
+      if (req.file) {
+        updates.profilePicture = `/uploads/profiles/${req.file.filename}`;
+      }
+
+      if (Object.keys(updates).length === 0) {
         return res
           .status(400)
-          .json({ success: false, msg: "Profile picture required" });
+          .json({ success: false, msg: "Nothing to update" });
       }
-      const profilePicture = `/uploads/profiles/${req.file.filename}`;
-      await User.update({ profilePicture }, { where: { id: currentUser.id } }); //update in database
+
+      await User.update(updates, { where: { id: currentUser.id } }); //update in database
       res.json({ success: true, msg: "Profile picture updated successfully" });
     } catch (error: any) {
       res.status(500).json({ success: false, msg: error.message });
