@@ -21,11 +21,11 @@ function Navbar({ onLogout }: NavbarProps) {
 
   const navLinks: NavItem[] = [
     { path: "/", label: "Home" },
-    // Profile path needs to be role-aware:
     {
-      path: user?.roles === "admin" ? "/admin/profile" : "/student/profile",
-      label: "Profile",
+      path: "/admin/students",
+      label: "Students",
       requiresAuth: true,
+      roles: ["admin"],
     },
     {
       path: "/admin/dashboard",
@@ -34,10 +34,9 @@ function Navbar({ onLogout }: NavbarProps) {
       roles: ["admin"],
     },
     {
-      path: "/admin/students",
-      label: "Students",
+      path: user?.roles === "admin" ? "/admin/profile" : "/student/profile",
+      label: "Profile",
       requiresAuth: true,
-      roles: ["admin"],
     },
   ];
 
@@ -50,27 +49,49 @@ function Navbar({ onLogout }: NavbarProps) {
   const closeMobileMenu = () => setIsMobileMenuOpen(false);
 
   return (
-    <div className="bg-white shadow-md">
-      <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between h-16">
+    <div className="bg-white border-b border-gray-100 shadow-sm">
+      <div className="max-w-7xl mx-auto px-6">
+        <div className="relative flex items-center justify-between h-16">
           {/* Logo */}
-          <Link to="/" className="flex items-center space-x-2">
-            <span className="text-lg font-bold text-purple-900">
+          <Link to="/" className="flex items-center gap-2.5">
+            <div className="w-7 h-7 bg-purple-900 rounded-lg flex items-center justify-center">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="w-4 h-4 text-white"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 14l9-5-9-5-9 5 9 5z"
+                />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 14l6.16-3.422A12.083 12.083 0 0121 21H3a12.083 12.083 0 012.84-10.422L12 14z"
+                />
+              </svg>
+            </div>
+            <span className="text-base font-bold text-purple-900 font-syne tracking-tight">
               StudentManage
             </span>
           </Link>
 
-          {/* Desktop nav links */}
-          <div className="hidden md:flex items-center space-x-6">
+          {/* Desktop nav — centered */}
+          <div className="hidden md:flex absolute left-1/2 -translate-x-1/2 items-center gap-3">
             {filteredLinks.map((link) => (
               <NavLink
                 key={link.path}
                 to={link.path}
                 className={({ isActive }) =>
-                  `text-sm font-medium transition-colors ${
+                  `px-5 py-2.5 rounded-lg text-base font-semibold transition-all ${
                     isActive
-                      ? "text-purple-900 border-b-2 border-purple-900 pb-0.5"
-                      : "text-gray-600 hover:text-purple-900"
+                      ? "bg-purple-50 text-purple-900"
+                      : "text-gray-600 hover:text-purple-900 hover:bg-gray-50"
                   }`
                 }
               >
@@ -82,28 +103,37 @@ function Navbar({ onLogout }: NavbarProps) {
           {/* Mobile toggle */}
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="md:hidden p-2 rounded-md text-gray-600 hover:text-purple-900 hover:bg-purple-50 transition-colors"
+            className="md:hidden p-2 rounded-lg text-gray-500 hover:text-purple-900 hover:bg-purple-50 transition-colors"
             aria-label="Toggle menu"
           >
-            {isMobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
+            {isMobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
           </button>
+
+          {/* Spacer to balance logo on desktop */}
+          <div className="hidden md:block invisible">
+            <Link to="/" className="flex items-center gap-2.5">
+              <div className="w-7 h-7" />
+              <span className="text-base font-bold font-syne tracking-tight">
+                StudentManage
+              </span>
+            </Link>
+          </div>
         </div>
 
         {/* Mobile menu */}
         {isMobileMenuOpen && (
           <div className="md:hidden py-3 border-t border-gray-100">
-            <div className="flex flex-col space-y-1">
-              {/* Nav links */}
+            <div className="flex flex-col gap-0.5">
               {filteredLinks.map((link) => (
                 <NavLink
                   key={link.path}
                   to={link.path}
                   onClick={closeMobileMenu}
                   className={({ isActive }) =>
-                    `px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                    `px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
                       isActive
                         ? "bg-purple-50 text-purple-900"
-                        : "text-gray-600 hover:bg-purple-50 hover:text-purple-900"
+                        : "text-gray-600 hover:bg-gray-50 hover:text-purple-900"
                     }`
                   }
                 >
@@ -111,28 +141,26 @@ function Navbar({ onLogout }: NavbarProps) {
                 </NavLink>
               ))}
 
-              {/* Divider */}
-              <div className="border-t border-gray-100 my-1" />
+              <div className="border-t border-gray-100 my-1.5" />
 
-              {/* Mobile auth: Login or Logout */}
               {user ? (
                 <button
                   onClick={() => {
                     onLogout();
                     closeMobileMenu();
                   }}
-                  className="flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium text-gray-600 hover:bg-purple-50 hover:text-purple-900 transition-colors w-full text-left"
+                  className="flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-600 hover:bg-purple-50 hover:text-purple-900 transition-colors w-full text-left"
                 >
-                  <LogOut size={16} />
+                  <LogOut size={15} />
                   <span>Logout</span>
                 </button>
               ) : (
                 <Link
                   to="/login"
                   onClick={closeMobileMenu}
-                  className="flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium text-gray-600 hover:bg-purple-50 hover:text-purple-900 transition-colors"
+                  className="flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-600 hover:bg-purple-50 hover:text-purple-900 transition-colors"
                 >
-                  <User size={16} />
+                  <User size={15} />
                   <span>Login</span>
                 </Link>
               )}

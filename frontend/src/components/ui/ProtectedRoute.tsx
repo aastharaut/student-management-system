@@ -9,7 +9,6 @@ function ProtectedRoute({ allowedRole }: { allowedRole?: string }) {
   if (!user) return <Navigate to="/login" />;
 
   if (allowedRole && user.roles !== allowedRole) {
-    // Redirect to their own profile if they try to access wrong role's pages
     return <Navigate to={`/${user.roles}/profile`} />;
   }
 

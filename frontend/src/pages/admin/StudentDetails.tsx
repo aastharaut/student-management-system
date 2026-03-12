@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router";
+import { ArrowLeft, Pencil, Check, X, Trash2 } from "lucide-react";
 import api from "../../api/api";
+import BreadCrumb from "../../components/ui/BreadCrumb";
 
 interface Student {
   id: number;
@@ -49,17 +51,13 @@ export default function StudentDetail() {
 
   const handleUpdate = () => {
     setSaving(true);
-
-    // Use FormData so we can send the new picture alongside text fields
     const formData = new FormData();
     formData.append("firstName", form.firstName || "");
     formData.append("lastName", form.lastName || "");
     formData.append("email", form.email || "");
     formData.append("age", String(form.age || ""));
     formData.append("course", form.course || "");
-    if (newPicture) {
-      formData.append("profilePicture", newPicture);
-    }
+    if (newPicture) formData.append("profilePicture", newPicture);
 
     api
       .put(`/api/admin/students/${id}`, formData)
@@ -87,178 +85,196 @@ export default function StudentDetail() {
       ? `${import.meta.env.VITE_SERVER_URL}${student.profilePicture}`
       : null;
 
-  if (loading) return <p className="p-4 text-gray-400">Loading...</p>;
-  if (!student) return <p className="p-4 text-gray-400">Student not found.</p>;
+  const initials = student
+    ? `${student.firstName[0]}${student.lastName[0]}`.toUpperCase()
+    : "";
 
-  return (
-    <div className="container mx-auto max-w-lg p-6">
-      {/* Back */}
-      <button
-        onClick={() => navigate("/admin/students")}
-        className="text-sm text-gray-400 hover:text-gray-600 mb-6 flex items-center gap-1"
-      >
-        ← Back to Students
-      </button>
-
-      {/* Profile Header */}
-      <div className="flex items-center gap-5 mb-6">
-        <div className="relative w-20 h-20 shrink-0">
-          <div className="w-20 h-20 rounded-full overflow-hidden bg-gray-100 flex items-center justify-center">
-            {avatarUrl ? (
-              <img
-                src={avatarUrl}
-                alt={`${student.firstName} ${student.lastName}`}
-                className="w-full h-full object-cover"
-              />
-            ) : (
-              <span className="text-2xl font-semibold text-gray-400">
-                {student.firstName[0]}
-                {student.lastName[0]}
-              </span>
-            )}
-          </div>
-          {/* Click to change photo in edit mode */}
-          {editing && (
-            <label className="absolute inset-0 rounded-full flex items-center justify-center bg-black bg-opacity-40 cursor-pointer">
-              <span className="text-white text-xs text-center leading-tight">
-                Change
-                <br />
-                Photo
-              </span>
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handleImageChange}
-                className="hidden"
-              />
-            </label>
-          )}
-        </div>
-        <div>
-          <h1 className="text-2xl font-bold">
-            {student.firstName} {student.lastName}
-          </h1>
-          <p className="text-gray-500">{student.email}</p>
+  if (loading)
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="flex items-center gap-2 text-gray-400 text-sm">
+          <div className="w-4 h-4 border-2 border-purple-200 border-t-purple-900 rounded-full animate-spin" />
+          Loading…
         </div>
       </div>
+    );
 
-      {/* Detail / Edit */}
-      {editing ? (
-        <div className="bg-white border rounded-lg p-4 flex flex-col gap-3 mb-6">
-          <div>
-            <label className="text-sm text-gray-500 mb-1 block">
-              First Name
-            </label>
-            <input
-              name="firstName"
-              value={form.firstName || ""}
-              onChange={handleChange}
-              className="w-full border rounded px-3 py-2"
-            />
-          </div>
-          <div>
-            <label className="text-sm text-gray-500 mb-1 block">
-              Last Name
-            </label>
-            <input
-              name="lastName"
-              value={form.lastName || ""}
-              onChange={handleChange}
-              className="w-full border rounded px-3 py-2"
-            />
-          </div>
-          <div>
-            <label className="text-sm text-gray-500 mb-1 block">Email</label>
-            <input
-              name="email"
-              value={form.email || ""}
-              onChange={handleChange}
-              className="w-full border rounded px-3 py-2"
-              type="email"
-            />
-          </div>
-          <div>
-            <label className="text-sm text-gray-500 mb-1 block">Age</label>
-            <input
-              name="age"
-              value={form.age || ""}
-              onChange={handleChange}
-              className="w-full border rounded px-3 py-2"
-              type="number"
-            />
-          </div>
-          <div>
-            <label className="text-sm text-gray-500 mb-1 block">Course</label>
-            <input
-              name="course"
-              value={form.course || ""}
-              onChange={handleChange}
-              className="w-full border rounded px-3 py-2"
-            />
-          </div>
-        </div>
-      ) : (
-        <div className="bg-white border rounded-lg divide-y mb-6">
-          <div className="flex justify-between px-4 py-3">
-            <span className="text-gray-500">First Name</span>
-            <span className="font-medium">{student.firstName}</span>
-          </div>
-          <div className="flex justify-between px-4 py-3">
-            <span className="text-gray-500">Last Name</span>
-            <span className="font-medium">{student.lastName}</span>
-          </div>
-          <div className="flex justify-between px-4 py-3">
-            <span className="text-gray-500">Email</span>
-            <span className="font-medium">{student.email}</span>
-          </div>
-          <div className="flex justify-between px-4 py-3">
-            <span className="text-gray-500">Age</span>
-            <span className="font-medium">{student.age || "—"}</span>
-          </div>
-          <div className="flex justify-between px-4 py-3">
-            <span className="text-gray-500">Course</span>
-            <span className="font-medium">{student.course || "—"}</span>
-          </div>
-        </div>
-      )}
+  if (!student)
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <p className="text-sm text-gray-400">Student not found.</p>
+      </div>
+    );
 
-      {/* Actions */}
-      {editing ? (
-        <div className="flex gap-3">
+  const detailRows = [
+    { label: "First Name", key: "firstName" },
+    { label: "Last Name", key: "lastName" },
+    { label: "Email", key: "email" },
+    { label: "Age", key: "age" },
+    { label: "Course", key: "course" },
+  ];
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <BreadCrumb title="Student Detail" />
+
+      <div className="p-6">
+        <div className="max-w-lg mx-auto">
+          {/* Back */}
           <button
-            onClick={() => {
-              setEditing(false);
-              setPreview(null);
-              setNewPicture(null);
-            }}
-            className="flex-1 border py-2 rounded hover:bg-gray-50"
+            onClick={() => navigate("/admin/students")}
+            className="flex items-center gap-1.5 text-sm text-gray-400 hover:text-purple-900 transition-colors mb-6"
           >
-            Cancel
+            <ArrowLeft size={15} />
+            Back to Students
           </button>
-          <button
-            onClick={handleUpdate}
-            disabled={saving}
-            className="flex-1 bg-blue-500 text-white py-2 rounded hover:bg-blue-600 disabled:opacity-50"
-          >
-            {saving ? "Saving..." : "Save Changes"}
-          </button>
+
+          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+            {/* Banner */}
+            <div className="h-24 bg-purple-900 relative">
+              <div
+                className="absolute inset-0 opacity-10"
+                style={{
+                  backgroundImage:
+                    "repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(255,255,255,.3) 10px, rgba(255,255,255,.3) 11px)",
+                }}
+              />
+            </div>
+
+            <div className="px-6 pb-6">
+              {/* Avatar + name */}
+              <div className="flex items-end gap-4 -mt-10 mb-6">
+                <div className="relative w-20 h-20 shrink-0">
+                  <div className="w-20 h-20 rounded-2xl overflow-hidden bg-purple-100 border-4 border-white shadow-md flex items-center justify-center">
+                    {avatarUrl ? (
+                      <img
+                        src={avatarUrl}
+                        alt={`${student.firstName} ${student.lastName}`}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <span className="text-xl font-bold text-purple-700 font-syne">
+                        {initials}
+                      </span>
+                    )}
+                  </div>
+                  {editing && (
+                    <label className="absolute inset-0 rounded-2xl flex items-center justify-center bg-black/40 cursor-pointer">
+                      <span className="text-white text-xs text-center leading-tight font-semibold">
+                        Change
+                        <br />
+                        Photo
+                      </span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleImageChange}
+                        className="hidden"
+                      />
+                    </label>
+                  )}
+                </div>
+                <div className="pb-1">
+                  <h1 className="text-xl font-bold text-gray-900 font-syne">
+                    {student.firstName} {student.lastName}
+                  </h1>
+                  <p className="text-sm text-gray-400">{student.email}</p>
+                </div>
+              </div>
+
+              {/* Divider */}
+              <div className="border-t border-gray-100 mb-5" />
+
+              {/* Detail / Edit */}
+              {editing ? (
+                <div className="space-y-4 mb-5">
+                  {detailRows.map((row) => (
+                    <div key={row.key}>
+                      <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1.5">
+                        {row.label}
+                      </label>
+                      <input
+                        name={row.key}
+                        value={(form as any)[row.key] || ""}
+                        onChange={handleChange}
+                        type={
+                          row.key === "age"
+                            ? "number"
+                            : row.key === "email"
+                              ? "email"
+                              : "text"
+                        }
+                        className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm text-gray-800 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-100 transition-all"
+                      />
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="rounded-xl border border-gray-100 divide-y divide-gray-50 mb-5 overflow-hidden">
+                  {detailRows.map((row) => (
+                    <div
+                      key={row.key}
+                      className="flex justify-between items-center px-4 py-3"
+                    >
+                      <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                        {row.label}
+                      </span>
+                      <span className="text-sm font-medium text-gray-800">
+                        {row.key === "course" && (student as any)[row.key] ? (
+                          <span className="bg-purple-100 text-purple-800 px-2.5 py-0.5 rounded-full text-xs font-semibold">
+                            {(student as any)[row.key]}
+                          </span>
+                        ) : (
+                          (student as any)[row.key] || "—"
+                        )}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Action buttons */}
+              {editing ? (
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => {
+                      setEditing(false);
+                      setPreview(null);
+                      setNewPicture(null);
+                    }}
+                    className="flex-1 flex items-center justify-center gap-2 border border-gray-200 text-gray-600 py-2.5 rounded-lg text-sm font-semibold hover:bg-gray-50 transition-colors"
+                  >
+                    <X size={14} /> Cancel
+                  </button>
+                  <button
+                    onClick={handleUpdate}
+                    disabled={saving}
+                    className="flex-1 flex items-center justify-center gap-2 bg-purple-900 text-white py-2.5 rounded-lg text-sm font-semibold hover:bg-purple-800 disabled:opacity-50 transition-colors"
+                  >
+                    <Check size={14} />
+                    {saving ? "Saving…" : "Save Changes"}
+                  </button>
+                </div>
+              ) : (
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => setEditing(true)}
+                    className="flex-1 flex items-center justify-center gap-2 bg-purple-900 text-white py-2.5 rounded-lg text-sm font-semibold hover:bg-purple-800 transition-colors"
+                  >
+                    <Pencil size={14} /> Edit
+                  </button>
+                  <button
+                    onClick={handleDelete}
+                    className="flex items-center justify-center gap-2 border border-red-200 text-red-500 px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-red-50 transition-colors"
+                  >
+                    <Trash2 size={14} /> Delete
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
         </div>
-      ) : (
-        <div className="flex gap-3">
-          <button
-            onClick={() => setEditing(true)}
-            className="flex-1 bg-blue-500 text-white py-2 rounded hover:bg-blue-600"
-          >
-            Edit
-          </button>
-          <button
-            onClick={handleDelete}
-            className="flex-1 bg-red-500 text-white py-2 rounded hover:bg-red-600"
-          >
-            Delete
-          </button>
-        </div>
-      )}
+      </div>
     </div>
   );
 }

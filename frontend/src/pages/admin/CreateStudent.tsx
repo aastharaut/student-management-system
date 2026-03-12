@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { X, Eye, EyeOff } from "lucide-react";
 import api from "../../api/api";
 
 interface Props {
@@ -17,6 +18,7 @@ export default function AddStudentModal({ onClose, onSaved }: Props) {
   });
   const [profilePicture, setProfilePicture] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -32,18 +34,9 @@ export default function AddStudentModal({ onClose, onSaved }: Props) {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-
     const formData = new FormData();
-    formData.append("firstName", form.firstName);
-    formData.append("lastName", form.lastName);
-    formData.append("email", form.email);
-    formData.append("age", form.age);
-    formData.append("course", form.course);
-    formData.append("password", form.password);
-    if (profilePicture) {
-      formData.append("profilePicture", profilePicture);
-    }
-
+    Object.entries(form).forEach(([k, v]) => formData.append(k, v));
+    if (profilePicture) formData.append("profilePicture", profilePicture);
     api
       .post("/api/admin/students", formData)
       .then(() => {
@@ -53,98 +46,126 @@ export default function AddStudentModal({ onClose, onSaved }: Props) {
       .catch((err) => console.error("Error creating student:", err));
   };
 
-  return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-      <div className="bg-white p-6 rounded shadow-lg w-96">
-        <h2 className="text-lg font-bold mb-4">Add Student</h2>
+  const fields = [
+    { name: "firstName", placeholder: "First Name", type: "text" },
+    { name: "lastName", placeholder: "Last Name", type: "text" },
+    { name: "email", placeholder: "Email Address", type: "email" },
+    { name: "age", placeholder: "Age", type: "number" },
+    { name: "course", placeholder: "Course", type: "text" },
+    { name: "password", placeholder: "Password", type: "password" },
+  ];
 
-        <form onSubmit={handleSubmit} className="flex flex-col gap-2">
-          {/* Profile Picture */}
-          <div className="flex flex-col items-center gap-2 mb-2">
-            <div className="w-20 h-20 rounded-full border overflow-hidden bg-gray-100 flex items-center justify-center">
-              {preview ? (
-                <img
-                  src={preview}
-                  alt="Preview"
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <span className="text-gray-400 text-sm">Photo</span>
+  return (
+    <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50 p-4">
+      <div className="bg-white rounded-2xl shadow-lg w-full max-w-md overflow-hidden max-h-[90vh] flex flex-col">
+        {/* Modal header */}
+        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+          <div>
+            <h2 className="text-base font-bold text-gray-900 font-syne">
+              Add Student
+            </h2>
+            <p className="text-xs text-gray-400 mt-0.5">
+              Fill in the student's details below
+            </p>
+          </div>
+          <button
+            onClick={onClose}
+            className="w-8 h-8 rounded-lg flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
+          >
+            <X size={16} />
+          </button>
+        </div>
+
+        <form
+          onSubmit={handleSubmit}
+          className="px-6 py-5 overflow-y-auto flex-1"
+        >
+          {/* Profile picture */}
+          <div className="mb-5">
+            <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1.5">
+              Profile Picture
+            </label>
+            <div className="flex flex-col items-start gap-3">
+              {preview && (
+                <div className="w-24 h-24 rounded-xl overflow-hidden border border-gray-200">
+                  <img
+                    src={preview}
+                    alt="Preview"
+                    className="w-full h-full object-cover"
+                  />
+                </div>
               )}
+              <label className="cursor-pointer inline-flex items-center gap-2 px-4 py-2 border border-gray-200 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50 hover:border-purple-300 hover:text-purple-900 transition-colors">
+                {preview ? "Change Photo" : "Add Picture"}
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageChange}
+                  className="hidden"
+                />
+              </label>
             </div>
-            <input
-              type="file"
-              accept="image/*"
-              onChange={handleImageChange}
-              className="text-sm"
-            />
           </div>
 
-          <input
-            name="firstName"
-            value={form.firstName}
-            onChange={handleChange}
-            placeholder="First Name"
-            className="border px-2 py-1 rounded"
-            required
-          />
-          <input
-            name="lastName"
-            value={form.lastName}
-            onChange={handleChange}
-            placeholder="Last Name"
-            className="border px-2 py-1 rounded"
-            required
-          />
-          <input
-            name="email"
-            value={form.email}
-            onChange={handleChange}
-            placeholder="Email"
-            className="border px-2 py-1 rounded"
-            required
-            type="email"
-          />
-          <input
-            name="age"
-            value={form.age}
-            onChange={handleChange}
-            placeholder="Age"
-            className="border px-2 py-1 rounded"
-            required
-            type="number"
-          />
-          <input
-            name="course"
-            value={form.course}
-            onChange={handleChange}
-            placeholder="Course"
-            className="border px-2 py-1 rounded"
-            required
-          />
-          <input
-            name="password"
-            value={form.password}
-            onChange={handleChange}
-            placeholder="Password"
-            className="border px-2 py-1 rounded"
-            required
-            type="password"
-          />
+          {/* Fields */}
+          <div className="space-y-3 mb-5">
+            {fields.slice(0, -1).map((f) => (
+              <div key={f.name}>
+                <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">
+                  {f.placeholder}
+                </label>
+                <input
+                  name={f.name}
+                  value={(form as any)[f.name]}
+                  onChange={handleChange}
+                  placeholder={f.placeholder}
+                  type={f.type}
+                  required
+                  className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm text-gray-800 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-100 transition-all"
+                />
+              </div>
+            ))}
 
-          <div className="flex justify-end gap-2 mt-2">
+            {/* Password with eye toggle */}
+            <div>
+              <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">
+                Password
+              </label>
+              <div className="relative">
+                <input
+                  name="password"
+                  value={form.password}
+                  onChange={handleChange}
+                  placeholder="Password"
+                  type={showPassword ? "text" : "password"}
+                  required
+                  className="w-full px-3 py-2.5 pr-10 border border-gray-200 rounded-lg text-sm text-gray-800 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-100 transition-all"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((prev) => !prev)}
+                  className="absolute inset-y-0 right-3 flex items-center text-gray-400 hover:text-gray-600 transition-colors"
+                >
+                  {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Actions */}
+          <div className="flex gap-3">
             <button
               type="button"
               onClick={onClose}
-              className="bg-gray-500 text-white px-4 py-1 rounded"
+              className="flex-1 border border-gray-200 text-gray-600 py-2.5 rounded-lg text-sm font-semibold hover:bg-gray-50 transition-colors"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="bg-blue-500 text-white px-4 py-1 rounded"
+              className="flex-1 bg-purple-900 text-white py-2.5 rounded-lg text-sm font-semibold hover:bg-purple-800 transition-colors"
             >
-              Save
+              Add Student
             </button>
           </div>
         </form>

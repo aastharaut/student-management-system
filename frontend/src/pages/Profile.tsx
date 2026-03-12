@@ -2,11 +2,10 @@ import { useSelector } from "react-redux";
 import { useNavigate } from "react-router";
 import { useState } from "react";
 import type { RootState } from "../redux/store";
-import { ArrowLeft } from "lucide-react";
+import { Pencil, Check, X } from "lucide-react";
 import BreadCrumb from "../components/ui/BreadCrumb";
 import { useDispatch } from "react-redux";
 import { login } from "../redux/slice/userSlice";
-
 import api from "../api/api";
 
 export default function ProfilePage() {
@@ -34,10 +33,7 @@ export default function ProfilePage() {
   }
 
   const handleChange = (e: any) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   const initials = `${user.firstName[0]}${user.lastName[0]}`.toUpperCase();
@@ -65,39 +61,60 @@ export default function ProfilePage() {
           headers: { "Content-Type": "multipart/form-data" },
         });
       }
-
-      //refresh Redux with latest db data after successful save
       const updated = await api.get("/api/me");
       dispatch(login(updated.data.data));
-
       alert("Profile updated!");
       setIsEditing(false);
     } catch (err) {
-      console.error(err); //only errors land here now
+      console.error(err);
       alert("Failed to update profile. Please try again.");
     }
   };
+
+  const fields = [
+    {
+      label: "First Name",
+      name: "firstName",
+      value: formData.firstName,
+      disabled: user.roles === "student",
+    },
+    {
+      label: "Last Name",
+      name: "lastName",
+      value: formData.lastName,
+      disabled: user.roles === "student",
+    },
+    {
+      label: "Age",
+      name: "age",
+      value: formData.age,
+      disabled: user.roles === "student",
+    },
+    ...(user.roles === "student"
+      ? [
+          {
+            label: "Course",
+            name: "course",
+            value: formData.course,
+            disabled: true,
+          },
+        ]
+      : []),
+  ];
+
   return (
     <div className="min-h-screen bg-gray-50">
       <BreadCrumb title="My Profile" />
 
       <div className="max-w-2xl mx-auto px-4 py-10">
-        {/* Back */}
-        <button
-          onClick={() => navigate(-1)}
-          className="flex items-center space-x-1 text-sm text-gray-500 hover:text-purple-900 mb-6"
-        >
-          <ArrowLeft size={16} />
-          <span>Back</span>
-        </button>
-
-        <div className="bg-white rounded-2xl shadow-sm border overflow-hidden">
-          <div className="h-24 bg-purple-900" />
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+          {/* Banner */}
+          <div className="h-32 bg-purple-900" />
 
           <div className="px-8 pb-8">
-            {/* Avatar */}
-            <div className="flex items-end space-x-5 -mt-10 mb-6">
-              <div className="w-20 h-20 rounded-2xl bg-white border-4 shadow-md overflow-hidden flex items-center justify-center text-purple-900 text-2xl font-bold">
+            {/* Avatar + name — centered */}
+            <div className="flex flex-col items-center -mt-12 mb-8 text-center">
+              <div className="w-24 h-24 rounded-2xl bg-white border-4 border-white shadow-md overflow-hidden flex items-center justify-center text-purple-900 text-2xl font-bold">
                 {user.profilePicture ? (
                   <img
                     src={`http://localhost:3000${user.profilePicture}`}
@@ -105,103 +122,97 @@ export default function ProfilePage() {
                     className="w-full h-full object-cover"
                   />
                 ) : (
-                  initials
+                  <span className="font-syne">{initials}</span>
                 )}
               </div>
+              <h1 className="mt-3 text-xl font-bold text-gray-900 font-syne">
+                {user.firstName} {user.lastName}
+              </h1>
+              <span className="mt-1.5 inline-block bg-purple-100 text-purple-800 text-xs px-2.5 py-0.5 rounded-full font-medium capitalize">
+                {user.roles}
+              </span>
+            </div>
 
+            {/* Divider */}
+            <div className="border-t border-gray-100 mb-6" />
+
+            {/* Fields */}
+            <div className="space-y-4">
+              {fields.map((field) => (
+                <div key={field.name}>
+                  <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1.5">
+                    {field.label}
+                  </label>
+                  <input
+                    name={field.name}
+                    value={field.value ?? ""}
+                    onChange={handleChange}
+                    disabled={field.disabled || !isEditing}
+                    className={`w-full px-4 py-2.5 border rounded-lg text-sm transition-all ${
+                      field.disabled || !isEditing
+                        ? "bg-gray-50 border-gray-100 text-gray-500 cursor-default"
+                        : "bg-white border-gray-200 text-gray-800 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-100"
+                    }`}
+                  />
+                </div>
+              ))}
+
+              {/* Profile picture upload */}
               <div>
-                <h1 className="text-xl font-bold text-gray-900">
-                  {user.firstName} {user.lastName}
-                </h1>
-
-                <span className="bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded-full capitalize">
-                  {user.roles}
-                </span>
+                <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1.5">
+                  Profile Picture
+                </label>
+                {isEditing ? (
+                  <label className="cursor-pointer inline-flex items-center gap-2 px-4 py-2 border border-gray-200 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50 hover:border-purple-300 hover:text-purple-900 transition-colors">
+                    {formData.profilePicture instanceof File
+                      ? "Change Photo"
+                      : "Add Photo"}
+                    <input
+                      type="file"
+                      accept="image/jpeg, image/jpg, image/png"
+                      onChange={(e) => {
+                        if (e.target.files?.[0]) {
+                          setFormData({
+                            ...formData,
+                            profilePicture: e.target.files[0] as any,
+                          });
+                        }
+                      }}
+                      className="hidden"
+                    />
+                  </label>
+                ) : (
+                  <p className="text-sm text-gray-400 italic">
+                    Enable editing to change photo
+                  </p>
+                )}
               </div>
             </div>
 
-            {/* PROFILE FIELDS */}
-
-            <div className="space-y-4">
-              {/* First Name */}
-              <input
-                name="firstName"
-                value={formData.firstName}
-                onChange={handleChange}
-                disabled={user.roles === "student" || !isEditing}
-                className="w-full border p-3 rounded-lg"
-              />
-
-              {/* Last Name */}
-              <input
-                name="lastName"
-                value={formData.lastName}
-                onChange={handleChange}
-                disabled={user.roles === "student" || !isEditing}
-                className="w-full border p-3 rounded-lg"
-              />
-
-              {/* Age */}
-              <input
-                name="age"
-                value={formData.age}
-                onChange={handleChange}
-                disabled={user.roles === "student" || !isEditing}
-                className="w-full border p-3 rounded-lg"
-              />
-
-              {/* Student only */}
-              {user.roles === "student" && (
-                <input
-                  name="course"
-                  value={formData.course}
-                  disabled
-                  className="w-full border p-3 rounded-lg bg-gray-100"
-                />
-              )}
-
-              {/* Profile Picture */}
-              <input
-                type="file"
-                accept="image/jpeg, image/jpg, image/png"
-                disabled={!isEditing}
-                onChange={(e) => {
-                  if (e.target.files?.[0]) {
-                    setFormData({
-                      ...formData,
-                      profilePicture: e.target.files[0] as any,
-                    });
-                  }
-                }}
-                className="w-full border p-3 rounded-lg"
-              />
-            </div>
-
-            {/* Buttons */}
-
-            <div className="flex gap-3 mt-6">
-              {!isEditing && (
+            {/* Action buttons */}
+            <div className="flex gap-3 mt-8">
+              {!isEditing ? (
                 <button
                   onClick={() => setIsEditing(true)}
-                  className="bg-purple-900 text-white px-5 py-2 rounded-lg"
+                  className="flex items-center gap-2 bg-purple-900 text-white px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-purple-800 transition-colors"
                 >
+                  <Pencil size={14} />
                   Edit Profile
                 </button>
-              )}
-
-              {isEditing && (
+              ) : (
                 <>
                   <button
                     onClick={handleSave}
-                    className="bg-green-600 text-white px-5 py-2 rounded-lg"
+                    className="flex items-center gap-2 bg-purple-900 text-white px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-purple-800 transition-colors"
                   >
-                    Save
+                    <Check size={14} />
+                    Save Changes
                   </button>
-
                   <button
                     onClick={() => setIsEditing(false)}
-                    className="bg-gray-300 px-5 py-2 rounded-lg"
+                    className="flex items-center gap-2 border border-gray-200 text-gray-600 px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-gray-50 transition-colors"
                   >
+                    <X size={14} />
                     Cancel
                   </button>
                 </>

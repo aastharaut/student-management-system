@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
+import { Search, X, UserPlus, ChevronLeft, ChevronRight } from "lucide-react";
 import api from "../../api/api";
 import AddStudentModal from "./CreateStudent";
+import BreadCrumb from "../../components/ui/BreadCrumb";
 
 interface Student {
   id: number;
@@ -13,10 +15,13 @@ interface Student {
   profilePicture?: string;
 }
 
+const PAGE_SIZE = 7;
+
 export default function Students() {
   const [students, setStudents] = useState<Student[]>([]);
   const [showModal, setShowModal] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
   const navigate = useNavigate();
 
   const fetchStudents = () => {
@@ -30,6 +35,11 @@ export default function Students() {
     fetchStudents();
   }, []);
 
+  // Reset to page 1 when search changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery]);
+
   const filteredStudents = students.filter((s) => {
     const query = searchQuery.toLowerCase().trim();
     if (!query) return true;
@@ -37,180 +47,213 @@ export default function Students() {
     return fullName.includes(query) || s.course.toLowerCase().includes(query);
   });
 
-  return (
-    <div className="container p-4">
-      {/* Header */}
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-xl font-bold">Students</h1>
-        <button
-          onClick={() => setShowModal(true)}
-          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors"
-        >
-          Add Student
-        </button>
-      </div>
+  const totalPages = Math.ceil(filteredStudents.length / PAGE_SIZE);
+  const paginated = filteredStudents.slice(
+    (currentPage - 1) * PAGE_SIZE,
+    currentPage * PAGE_SIZE,
+  );
 
-      {/* Search Bar */}
-      <div className="mb-4">
-        <div className="relative max-w-sm">
-          <span className="absolute inset-y-0 left-3 flex items-center text-gray-400 pointer-events-none">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-4 w-4"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z"
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <BreadCrumb title="Students" />
+
+      <div className="p-6">
+        {/* Add Student button */}
+        <div className="max-w-5xl mx-auto mb-4 flex justify-end">
+          <button
+            onClick={() => setShowModal(true)}
+            className="flex items-center gap-2 bg-purple-900 text-white px-4 py-2.5 rounded-lg text-sm font-semibold hover:bg-purple-800 active:bg-purple-950 transition-colors shadow-sm"
+          >
+            <UserPlus size={15} />
+            Add Student
+          </button>
+        </div>
+
+        <div className="max-w-5xl mx-auto space-y-4">
+          {/* Search */}
+          <div className="flex items-center gap-3">
+            <div className="relative w-full max-w-sm">
+              <Search
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                size={15}
               />
-            </svg>
-          </span>
-          <input
-            type="text"
-            placeholder="Search by name or course..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-9 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent"
-          />
-          {searchQuery && (
-            <button
-              onClick={() => setSearchQuery("")}
-              className="absolute inset-y-0 right-3 flex items-center text-gray-400 hover:text-gray-600"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-4 w-4"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              </svg>
-            </button>
+              <input
+                type="text"
+                placeholder="Search by name or course…"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-9 pr-9 py-2.5 border border-gray-200 rounded-lg text-sm bg-white focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-100 transition-all"
+              />
+              {searchQuery && (
+                <button
+                  onClick={() => setSearchQuery("")}
+                  className="absolute inset-y-0 right-3 flex items-center text-gray-400 hover:text-gray-600"
+                >
+                  <X size={14} />
+                </button>
+              )}
+            </div>
+            {searchQuery && (
+              <p className="text-xs text-gray-400 whitespace-nowrap">
+                {filteredStudents.length} result
+                {filteredStudents.length !== 1 ? "s" : ""}
+              </p>
+            )}
+          </div>
+
+          {/* Table */}
+          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+            <table className="min-w-full divide-y divide-gray-100 text-sm">
+              <thead>
+                <tr className="bg-gray-50">
+                  <th className="px-5 py-3.5 text-left text-xs font-semibold text-gray-800 uppercase tracking-wider">
+                    Student
+                  </th>
+                  <th className="px-5 py-3.5 text-left text-xs font-semibold text-gray-800 uppercase tracking-wider">
+                    Email
+                  </th>
+                  <th className="px-5 py-3.5 text-left text-xs font-semibold text-gray-800 uppercase tracking-wider">
+                    Course
+                  </th>
+                  <th className="px-5 py-3.5 text-left text-xs font-semibold text-gray-800 uppercase tracking-wider">
+                    Age
+                  </th>
+                  <th className="px-5 py-3.5 w-8" />
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-50">
+                {paginated.map((s) => (
+                  <tr
+                    key={s.id}
+                    onClick={() => navigate(`/admin/students/${s.id}`)}
+                    className="hover:bg-purple-50/50 cursor-pointer transition-colors group"
+                  >
+                    <td className="px-5 py-3.5 whitespace-nowrap">
+                      <div className="flex items-center gap-3">
+                        <div className="w-9 h-9 rounded-xl overflow-hidden bg-purple-100 shrink-0 flex items-center justify-center">
+                          {s.profilePicture ? (
+                            <img
+                              src={`${import.meta.env.VITE_SERVER_URL}${s.profilePicture}`}
+                              alt={`${s.firstName} ${s.lastName}`}
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <span className="text-xs font-bold text-purple-800">
+                              {s.firstName[0]}
+                              {s.lastName[0]}
+                            </span>
+                          )}
+                        </div>
+                        <span className="font-semibold text-gray-800">
+                          {s.firstName} {s.lastName}
+                        </span>
+                      </div>
+                    </td>
+                    <td className="px-5 py-3.5 whitespace-nowrap text-gray-500">
+                      {s.email}
+                    </td>
+                    <td className="px-5 py-3.5 whitespace-nowrap font-semibold text-purple-900">
+                      {s.course}
+                    </td>
+                    <td className="px-5 py-3.5 whitespace-nowrap text-gray-500">
+                      {s.age}
+                    </td>
+                    <td className="px-5 py-3.5 whitespace-nowrap text-right">
+                      <ChevronRight
+                        size={16}
+                        className="text-gray-300 group-hover:text-purple-400 transition-colors"
+                      />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+
+            {/* Empty states */}
+            {filteredStudents.length === 0 && students.length > 0 && (
+              <div className="py-14 text-center">
+                <div className="w-10 h-10 bg-gray-100 rounded-xl flex items-center justify-center mx-auto mb-3">
+                  <Search size={16} className="text-gray-400" />
+                </div>
+                <p className="text-sm text-gray-400">
+                  No students match "{searchQuery}".
+                </p>
+              </div>
+            )}
+            {students.length === 0 && (
+              <div className="py-14 text-center">
+                <div className="w-10 h-10 bg-purple-50 rounded-xl flex items-center justify-center mx-auto mb-3">
+                  <UserPlus size={16} className="text-purple-400" />
+                </div>
+                <p className="text-sm text-gray-400">No students yet.</p>
+                <button
+                  onClick={() => setShowModal(true)}
+                  className="mt-3 text-xs text-purple-700 font-semibold hover:underline"
+                >
+                  Add your first student →
+                </button>
+              </div>
+            )}
+          </div>
+
+          {/* Pagination + count */}
+          {filteredStudents.length > 0 && (
+            <div className="flex items-center justify-between">
+              <p className="text-xs text-gray-400">
+                Showing {(currentPage - 1) * PAGE_SIZE + 1}–
+                {Math.min(currentPage * PAGE_SIZE, filteredStudents.length)} of{" "}
+                {filteredStudents.length} student
+                {filteredStudents.length !== 1 ? "s" : ""}
+              </p>
+
+              {totalPages > 1 && (
+                <div className="flex items-center gap-1">
+                  <button
+                    onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                    disabled={currentPage === 1}
+                    className="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-200 text-gray-500 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                  >
+                    <ChevronLeft size={14} />
+                  </button>
+
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                    (page) => (
+                      <button
+                        key={page}
+                        onClick={() => setCurrentPage(page)}
+                        className={`w-8 h-8 flex items-center justify-center rounded-lg text-xs font-semibold transition-colors ${
+                          currentPage === page
+                            ? "bg-purple-900 text-white"
+                            : "border border-gray-200 text-gray-500 hover:bg-gray-50"
+                        }`}
+                      >
+                        {page}
+                      </button>
+                    ),
+                  )}
+
+                  <button
+                    onClick={() =>
+                      setCurrentPage((p) => Math.min(totalPages, p + 1))
+                    }
+                    disabled={currentPage === totalPages}
+                    className="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-200 text-gray-500 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                  >
+                    <ChevronRight size={14} />
+                  </button>
+                </div>
+              )}
+            </div>
           )}
         </div>
-        {searchQuery && (
-          <p className="mt-1 text-xs text-gray-400">
-            {filteredStudents.length} result
-            {filteredStudents.length !== 1 ? "s" : ""} for &quot;{searchQuery}
-            &quot;
-          </p>
+
+        {showModal && (
+          <AddStudentModal
+            onClose={() => setShowModal(false)}
+            onSaved={fetchStudents}
+          />
         )}
       </div>
-
-      {/* Table */}
-      <div className="overflow-x-auto rounded-lg border border-gray-200 shadow-sm">
-        <table className="min-w-full divide-y divide-gray-200 bg-white text-sm">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                Student
-              </th>
-              <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                Email
-              </th>
-              <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                Course
-              </th>
-              <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                Age
-              </th>
-              <th className="px-4 py-3" />
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-100">
-            {filteredStudents.map((s) => (
-              <tr
-                key={s.id}
-                onClick={() => navigate(`/admin/students/${s.id}`)}
-                className="hover:bg-blue-50 cursor-pointer transition-colors"
-              >
-                {/* Student name + avatar */}
-                <td className="px-4 py-3 whitespace-nowrap">
-                  <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-full overflow-hidden bg-gray-100 shrink-0 flex items-center justify-center">
-                      {s.profilePicture ? (
-                        <img
-                          src={`${import.meta.env.VITE_SERVER_URL}${s.profilePicture}`}
-                          alt={`${s.firstName} ${s.lastName}`}
-                          className="w-full h-full object-cover"
-                        />
-                      ) : (
-                        <span className="text-sm font-semibold text-gray-400">
-                          {s.firstName[0]}
-                          {s.lastName[0]}
-                        </span>
-                      )}
-                    </div>
-                    <span className="font-medium text-gray-800">
-                      {s.firstName} {s.lastName}
-                    </span>
-                  </div>
-                </td>
-
-                {/* Email */}
-                <td className="px-4 py-3 whitespace-nowrap text-gray-500">
-                  {s.email}
-                </td>
-
-                {/* Course */}
-                <td className="px-4 py-3 whitespace-nowrap">
-                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-700">
-                    {s.course}
-                  </span>
-                </td>
-
-                {/* Age */}
-                <td className="px-4 py-3 whitespace-nowrap text-gray-500">
-                  {s.age}
-                </td>
-
-                {/* Arrow
-                <td className="px-4 py-3 whitespace-nowrap text-right text-gray-300 text-lg">
-                  ›
-                </td> */}
-              </tr>
-            ))}
-          </tbody>
-        </table>
-
-        {/* Empty states */}
-        {filteredStudents.length === 0 && students.length > 0 && (
-          <div className="py-10 text-center text-gray-400 text-sm">
-            No students match &quot;{searchQuery}&quot;. Try a different name or
-            course.
-          </div>
-        )}
-        {students.length === 0 && (
-          <div className="py-10 text-center text-gray-400 text-sm">
-            No students yet. Add one to get started.
-          </div>
-        )}
-      </div>
-
-      {/* Footer count */}
-      {students.length > 0 && (
-        <p className="mt-3 text-xs text-gray-400 text-right">
-          Showing {filteredStudents.length} of {students.length} student
-          {students.length !== 1 ? "s" : ""}
-        </p>
-      )}
-
-      {showModal && (
-        <AddStudentModal
-          onClose={() => setShowModal(false)}
-          onSaved={fetchStudents}
-        />
-      )}
     </div>
   );
 }
