@@ -40,29 +40,30 @@ export default function ProfilePage() {
 
   const handleSave = async () => {
     try {
-      if (user.roles === "student") {
-        const form = new FormData();
-        if (formData.profilePicture instanceof File) {
-          form.append("profilePicture", formData.profilePicture);
-        }
-        await api.put("/api/student/profile", form, {
-          headers: { "Content-Type": "multipart/form-data" },
-        });
-      } else {
-        const form = new FormData();
-        form.append("firstName", formData.firstName);
-        form.append("lastName", formData.lastName);
-        form.append("age", String(formData.age ?? ""));
-        form.append("course", formData.course);
-        if (formData.profilePicture instanceof File) {
-          form.append("profilePicture", formData.profilePicture);
-        }
-        await api.put("/api/admin/profile", form, {
-          headers: { "Content-Type": "multipart/form-data" },
-        });
+      const form = new FormData();
+      form.append("firstName", formData.firstName);
+      form.append("lastName", formData.lastName);
+      form.append("age", String(formData.age ?? ""));
+      form.append("course", formData.course);
+
+      if (formData.profilePicture instanceof File) {
+        form.append("profilePicture", formData.profilePicture);
       }
-      const updated = await api.get("/api/me");
-      dispatch(login(updated.data.data));
+      const apiUrl =
+        user.roles === "student"
+          ? "/api/student/profile"
+          : "/api/admin/profile";
+
+      const res = await api.put(apiUrl, form, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+
+      const updatedUser = {
+        ...user,
+        ...res.data.data,
+      };
+      dispatch(login(updatedUser));
+
       alert("Profile updated!");
       setIsEditing(false);
     } catch (err) {
@@ -117,7 +118,7 @@ export default function ProfilePage() {
               <div className="w-24 h-24 rounded-2xl bg-white border-4 border-white shadow-md overflow-hidden flex items-center justify-center text-purple-900 text-2xl font-bold">
                 {user.profilePicture ? (
                   <img
-                    src={`http://localhost:3000${user.profilePicture}`}
+                    src={user.profilePicture}
                     alt="Profile"
                     className="w-full h-full object-cover"
                   />
