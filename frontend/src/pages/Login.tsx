@@ -14,29 +14,28 @@ export default function LoginPage() {
   const dispatch = useDispatch();
   const [showPassword, setShowPassword] = useState(false);
 
-  const handleLogin = (e: FormEvent<HTMLFormElement>) => {
+  const handleLogin = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const form = e.currentTarget;
-    api
-      .post("/api/login", {
+    try {
+      const res = await api.post("/api/login", {
         email: (form.elements.namedItem("email") as HTMLInputElement).value,
         password: (form.elements.namedItem("password") as HTMLInputElement)
           .value,
-      })
-      .then((res) => {
-        dispatch(login(res.data.user));
-        localStorage.setItem("token", res.data.token);
-        notify.success("Login successful");
-        const role = res.data.user.roles;
-        if (role === "admin") navigate("/admin/students");
-        else if (role === "student") navigate("/student/profile");
-        else navigate("/");
-      })
-      .catch((err) => {
-        notify.error(err.response.data.msg);
       });
-  };
 
+      dispatch(login(res.data.user));
+      localStorage.setItem("token", res.data.token);
+      notify.success("Login successful");
+
+      const role = res.data.user.roles;
+      if (role === "admin") navigate("/admin/students");
+      else if (role === "student") navigate("/student/profile");
+      else navigate("/");
+    } catch (err: any) {
+      notify.error(err.response?.data?.msg || err.message || "Login failed");
+    }
+  };
   return (
     <div className="min-h-screen bg-gray-50">
       <ToastContainer />
