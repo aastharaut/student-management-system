@@ -64,7 +64,7 @@ const adminController = {
 
       // If a new profile picture was uploaded, include it in the updates
       if (req.file) {
-        updates.profilePicture = `/uploads/profiles/${req.file.filename}`;
+        updates.profilePicture = (req.file as any).path;
       }
 
       const student = await User.findOne({ where: { id, roles: "student" } });
@@ -102,7 +102,7 @@ const adminController = {
 
       //handle uploaded profile picture
       if (req.file) {
-        updates.profilePicture = `/uploads/profiles/${req.file.filename}`;
+        updates.profilePicture = (req.file as any).path;
       }
 
       const user = await User.findByPk(currentUser.id);

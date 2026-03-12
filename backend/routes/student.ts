@@ -1,17 +1,18 @@
 import { Router } from "express";
 import { checkAuthentication } from "../middleware/auth";
-import User from "../models/User"; // or User model if unified
-import multer from "multer";
-import path from "path";
+import User from "../models/User";
+import upload from "../middleware/upload";
+//import multer from "multer";
+//import path from "path";
 
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, "uploads/profiles"),
-  filename: (req, file, cb) => {
-    const unique = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
-    cb(null, `${unique}${path.extname(file.originalname)}`);
-  },
-});
-const upload = multer({ storage });
+// const storage = multer.diskStorage({
+//   destination: (req, file, cb) => cb(null, "uploads/profiles"),
+//   filename: (req, file, cb) => {
+//     const unique = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
+//     cb(null, `${unique}${path.extname(file.originalname)}`);
+//   },
+// });
+// const upload = multer({ storage });
 const router = Router();
 
 router.use(checkAuthentication); // Student can only access their own data
@@ -34,13 +35,12 @@ router.put(
   async (req: any, res) => {
     try {
       const currentUser = req.user;
-
       if (currentUser.roles !== "student") {
         return res.status(403).json({ success: false, msg: "Not allowed" });
       }
       const updates: any = {};
       if (req.file) {
-        updates.profilePicture = `/uploads/profiles/${req.file.filename}`;
+        updates.profilePicture = (req.file as any).path;
       }
 
       if (Object.keys(updates).length === 0) {
