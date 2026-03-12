@@ -42,7 +42,6 @@ export default function ProfilePage() {
 
   const initials = `${user.firstName[0]}${user.lastName[0]}`.toUpperCase();
 
-  // REPLACE the entire handleSave with this:
   const handleSave = async () => {
     try {
       if (user.roles === "student") {
@@ -50,7 +49,9 @@ export default function ProfilePage() {
         if (formData.profilePicture instanceof File) {
           form.append("profilePicture", formData.profilePicture);
         }
-        await api.put("/api/student/profile", form);
+        await api.put("/api/student/profile", form, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
       } else {
         const form = new FormData();
         form.append("firstName", formData.firstName);
@@ -60,17 +61,19 @@ export default function ProfilePage() {
         if (formData.profilePicture instanceof File) {
           form.append("profilePicture", formData.profilePicture);
         }
-        await api.put("/api/admin/profile", form);
+        await api.put("/api/admin/profile", form, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
       }
 
-      // ✅ Refresh Redux with latest DB data after successful save
+      //refresh Redux with latest db data after successful save
       const updated = await api.get("/api/me");
       dispatch(login(updated.data.data));
 
       alert("Profile updated!");
       setIsEditing(false);
     } catch (err) {
-      console.error(err); // ✅ only errors land here now
+      console.error(err); //only errors land here now
       alert("Failed to update profile. Please try again.");
     }
   };
@@ -94,8 +97,16 @@ export default function ProfilePage() {
           <div className="px-8 pb-8">
             {/* Avatar */}
             <div className="flex items-end space-x-5 -mt-10 mb-6">
-              <div className="w-20 h-20 rounded-2xl bg-white border-4 shadow-md flex items-center justify-center text-purple-900 text-2xl font-bold">
-                {initials}
+              <div className="w-20 h-20 rounded-2xl bg-white border-4 shadow-md overflow-hidden flex items-center justify-center text-purple-900 text-2xl font-bold">
+                {user.profilePicture ? (
+                  <img
+                    src={`http://localhost:3000${user.profilePicture}`}
+                    alt="Profile"
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  initials
+                )}
               </div>
 
               <div>

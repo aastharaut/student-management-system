@@ -174,10 +174,10 @@ export default function Students() {
                   {s.age}
                 </td>
 
-                {/* Arrow */}
+                {/* Arrow
                 <td className="px-4 py-3 whitespace-nowrap text-right text-gray-300 text-lg">
                   ›
-                </td>
+                </td> */}
               </tr>
             ))}
           </tbody>
