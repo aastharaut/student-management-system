@@ -66,7 +66,9 @@ const adminController = {
       if (req.file) {
         updates.profilePicture = (req.file as any).path;
       }
-
+      //   if (req.file) {
+      //     updates.profilePicture = `/uploads/profiles/${req.file.filename}`;
+      //   }
       const student = await User.findOne({ where: { id, roles: "student" } });
       if (!student) {
         return res
@@ -101,6 +103,9 @@ const adminController = {
       const updates = req.body;
 
       //handle uploaded profile picture
+      //   if (req.file) {
+      //     updates.profilePicture = `/uploads/profiles/${req.file.filename}`;
+      //   }
       if (req.file) {
         updates.profilePicture = (req.file as any).path;
       }

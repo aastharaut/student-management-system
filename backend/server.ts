@@ -8,12 +8,12 @@ import "./models/User";
 import cors from "cors";
 import "dotenv/config";
 import adminRoutes from "./routes/admin";
-import path from "path";
+//import path from "path";
 
 const app = express();
 app.use(express.json());
 app.use(cors());
-app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
+//app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 console.log("JWT_SECRET loaded:", process.env.JWT_SECRET ? "Yes" : "No");
 
 // auth routes directly at /api rather than /api/auth
