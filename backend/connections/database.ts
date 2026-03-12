@@ -1,7 +1,8 @@
 import { Sequelize } from "sequelize";
 import pg from "pg";
 const sequelize = new Sequelize(
-  "postgres://postgres:1907@localhost:5432/project",
+  // "postgres://postgres:1907@localhost:5432/project",
+  "postgresql://neondb_owner:npg_LXgYhQuR5N3E@ep-super-night-a1kdbbd4-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require",
   {
     logging: false, //reducing console logs, set to true for debugging
     dialectModule: pg,
