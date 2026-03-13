@@ -12,12 +12,19 @@ import adminRoutes from "./routes/admin";
 
 const app = express();
 app.use(express.json());
+app.options(
+  "*",
+  cors({
+    origin:
+      "https://student-management-system-aastha-rauts-projects.vercel.app",
+    credentials: true,
+  }),
+);
+
 app.use(
   cors({
-    origin: [
-      "http://localhost:5173",
-      "https://student-management-system-aastha-rauts-projects.vercel.app", //frontend URL
-    ],
+    origin:
+      "https://student-management-system-aastha-rauts-projects.vercel.app",
     credentials: true,
   }),
 );
