@@ -37,7 +37,11 @@ export default function ProfilePage() {
   };
 
   const initials = `${user.firstName[0]}${user.lastName[0]}`.toUpperCase();
-
+  const profilePicUrl =
+    user.profilePicture?.startsWith("https:/") &&
+    !user.profilePicture?.startsWith("https://")
+      ? user.profilePicture.replace("https:/", "https://")
+      : user.profilePicture;
   const handleSave = async () => {
     try {
       const form = new FormData();
@@ -116,9 +120,9 @@ export default function ProfilePage() {
             {/* Avatar + name — centered */}
             <div className="flex flex-col items-center -mt-12 mb-8 text-center">
               <div className="w-24 h-24 rounded-2xl bg-white border-4 border-white shadow-md overflow-hidden flex items-center justify-center text-purple-900 text-2xl font-bold">
-                {user.profilePicture ? (
+                {profilePicUrl ? (
                   <img
-                    src={user.profilePicture}
+                    src={profilePicUrl} // changed from user.profilePicture
                     alt="Profile"
                     className="w-full h-full object-cover"
                   />
