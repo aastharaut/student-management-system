@@ -43,9 +43,7 @@ export default function AddStudentModal({ onClose, onSaved }: Props) {
     }
 
     api
-      .post("/api/admin/students", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      })
+      .post("/api/admin/students", formData)
       .then(() => {
         onSaved();
         onClose();
