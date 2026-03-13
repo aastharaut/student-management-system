@@ -82,9 +82,8 @@ export default function StudentDetail() {
   const avatarUrl = preview
     ? preview
     : student?.profilePicture
-      ? `${import.meta.env.VITE_SERVER_URL}${student.profilePicture}`
+      ? student.profilePicture
       : null;
-
   const initials = student
     ? `${student.firstName[0]}${student.lastName[0]}`.toUpperCase()
     : "";

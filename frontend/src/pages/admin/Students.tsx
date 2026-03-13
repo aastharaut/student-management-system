@@ -133,7 +133,7 @@ export default function Students() {
                         <div className="w-9 h-9 rounded-xl overflow-hidden bg-purple-100 shrink-0 flex items-center justify-center">
                           {s.profilePicture ? (
                             <img
-                              src={`${import.meta.env.VITE_SERVER_URL}${s.profilePicture}`}
+                              src={s.profilePicture}
                               alt={`${s.firstName} ${s.lastName}`}
                               className="w-full h-full object-cover"
                             />
