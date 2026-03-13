@@ -44,6 +44,7 @@ const adminController = {
         course,
         password,
         roles: "student",
+        profilePicture: req.file ? (req.file as any).path : null,
       });
       res.status(201).json({ success: true, data: newStudent });
     } catch (err: any) {
