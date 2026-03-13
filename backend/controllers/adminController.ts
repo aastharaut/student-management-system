@@ -34,6 +34,8 @@ const adminController = {
 
   // Create student
   createStudent: async (req: Request, res: Response, next: NextFunction) => {
+    console.log("body:", req.body);
+    console.log("file:", req.file);
     try {
       const { firstName, lastName, email, age, course, password } = req.body;
       const newStudent = await User.create({
