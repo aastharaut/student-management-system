@@ -21,9 +21,8 @@ app.use(
     credentials: true,
   }),
 );
-
 app.options(
-  "*",
+  "/(.*)",
   cors({
     origin: [
       "https://student-management-system-nine-lovat.vercel.app",
