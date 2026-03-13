@@ -107,6 +107,7 @@ const adminController = {
       //     updates.profilePicture = `/uploads/profiles/${req.file.filename}`;
       //   }
       if (req.file) {
+        console.log("Cloudinary URL:", req.file.path); // ← add this
         updates.profilePicture = (req.file as any).path;
       }
 
