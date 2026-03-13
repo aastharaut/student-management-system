@@ -28,7 +28,9 @@ router.get("/profile", async (req: any, res) => {
     res.status(500).json({ success: false, msg: error.message });
   }
 });
+
 // Update current student's profile picture
+
 router.put(
   "/profile",
   upload.single("profilePicture"),
@@ -38,23 +40,26 @@ router.put(
       if (currentUser.roles !== "student") {
         return res.status(403).json({ success: false, msg: "Not allowed" });
       }
+
       const updates: any = {};
       if (req.file) {
         updates.profilePicture = (req.file as any).path;
       }
-
       if (Object.keys(updates).length === 0) {
         return res
           .status(400)
           .json({ success: false, msg: "Nothing to update" });
       }
+      const user = await User.findByPk(currentUser.id); //fetch user
+      if (!user) {
+        return res.status(404).json({ success: false, msg: "User not found" });
+      }
 
-      await User.update(updates, { where: { id: currentUser.id } }); //update in database
-      res.json({ success: true, msg: "Profile picture updated successfully" });
+      const updated = await user.update(updates);
+      res.json({ success: true, data: updated }); //return full updated user
     } catch (error: any) {
       res.status(500).json({ success: false, msg: error.message });
     }
   },
 );
-
 export default router;
