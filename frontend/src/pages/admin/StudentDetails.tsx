@@ -142,7 +142,7 @@ export default function StudentDetail() {
             </div>
 
             <div className="px-6 pb-6">
-              {/* Avatar + name */}
+              {/* Avatar */}
               <div className="flex items-end gap-4 -mt-10 mb-6">
                 <div className="relative w-20 h-20 shrink-0">
                   <div className="w-20 h-20 rounded-2xl overflow-hidden bg-purple-100 border-4 border-white shadow-md flex items-center justify-center">
