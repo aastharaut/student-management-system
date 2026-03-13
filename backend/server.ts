@@ -21,16 +21,6 @@ app.use(
     credentials: true,
   }),
 );
-app.options(
-  "/(.*)",
-  cors({
-    origin: [
-      "https://student-management-system-nine-lovat.vercel.app",
-      /https:\/\/student-management-system.*\.vercel\.app$/,
-    ],
-    credentials: true,
-  }),
-);
 //app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 console.log("JWT_SECRET loaded:", process.env.JWT_SECRET ? "Yes" : "No");
 
