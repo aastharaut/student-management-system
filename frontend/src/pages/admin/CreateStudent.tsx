@@ -37,8 +37,15 @@ export default function AddStudentModal({ onClose, onSaved }: Props) {
     const formData = new FormData();
     Object.entries(form).forEach(([k, v]) => formData.append(k, v));
     if (profilePicture) formData.append("profilePicture", profilePicture);
+
+    for (let [key, val] of formData.entries()) {
+      console.log(key, val);
+    }
+
     api
-      .post("/api/admin/students", formData)
+      .post("/api/admin/students", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      })
       .then(() => {
         onSaved();
         onClose();
