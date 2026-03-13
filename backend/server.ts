@@ -12,7 +12,15 @@ import adminRoutes from "./routes/admin";
 
 const app = express();
 app.use(express.json());
-app.use(cors());
+app.use(
+  cors({
+    origin: [
+      "http://localhost:5173",
+      "https://student-management-system-aastha-rauts-projects.vercel.app", //frontend URL
+    ],
+    credentials: true,
+  }),
+);
 //app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 console.log("JWT_SECRET loaded:", process.env.JWT_SECRET ? "Yes" : "No");
 
