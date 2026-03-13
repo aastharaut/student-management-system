@@ -7,8 +7,7 @@ const storage = new CloudinaryStorage({
   params: async (req, file) => {
     return {
       folder: "student_profiles",
-      format: file.mimetype.split("/")[1], // jpg, png
-      public_id: Date.now() + "-" + file.originalname,
+      public_id: Date.now() + "-" + file.originalname.split(".")[0],
     };
   },
 });
