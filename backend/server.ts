@@ -12,19 +12,23 @@ import adminRoutes from "./routes/admin";
 
 const app = express();
 app.use(express.json());
-app.options(
-  "*",
+app.use(
   cors({
-    origin:
-      "https://student-management-system-aastha-rauts-projects.vercel.app",
+    origin: [
+      "https://student-management-system-nine-lovat.vercel.app",
+      /https:\/\/student-management-system.*\.vercel\.app$/,
+    ],
     credentials: true,
   }),
 );
 
-app.use(
+app.options(
+  "*",
   cors({
-    origin:
-      "https://student-management-system-aastha-rauts-projects.vercel.app",
+    origin: [
+      "https://student-management-system-nine-lovat.vercel.app",
+      /https:\/\/student-management-system.*\.vercel\.app$/,
+    ],
     credentials: true,
   }),
 );
