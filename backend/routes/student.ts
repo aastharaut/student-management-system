@@ -43,7 +43,7 @@ router.put(
 
       const updates: any = {};
       if (req.file) {
-        console.log("Cloudinary URL:", req.file.path); // ← add this
+        console.log("Cloudinary URL:", req.file.path);
         updates.profilePicture = (req.file as any).path;
       }
       if (Object.keys(updates).length === 0) {
