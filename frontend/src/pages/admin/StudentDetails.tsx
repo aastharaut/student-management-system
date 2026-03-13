@@ -124,27 +124,18 @@ export default function StudentDetail() {
             onClick={() => navigate("/admin/students")}
             className="flex items-center gap-1.5 text-sm text-gray-400 hover:text-purple-900 transition-colors mb-6"
           >
-            <ArrowLeft size={15} />
             Back to Students
           </button>
 
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
             {/* Banner */}
-            <div className="h-24 bg-purple-900 relative">
-              <div
-                className="absolute inset-0 opacity-10"
-                style={{
-                  backgroundImage:
-                    "repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(255,255,255,.3) 10px, rgba(255,255,255,.3) 11px)",
-                }}
-              />
-            </div>
+            <div className="h-32 bg-purple-900" />
 
             <div className="px-6 pb-6">
-              {/* Avatar */}
-              <div className="flex items-end gap-4 -mt-10 mb-6">
-                <div className="relative w-20 h-20 shrink-0">
-                  <div className="w-20 h-20 rounded-2xl overflow-hidden bg-purple-100 border-4 border-white shadow-md flex items-center justify-center">
+              {/* Avatar — centered */}
+              <div className="flex flex-col items-center -mt-12 mb-6 text-center">
+                <div className="relative w-24 h-24 shrink-0">
+                  <div className="w-24 h-24 rounded-2xl overflow-hidden bg-purple-100 border-4 border-white shadow-md flex items-center justify-center">
                     {avatarUrl ? (
                       <img
                         src={avatarUrl}
@@ -152,7 +143,7 @@ export default function StudentDetail() {
                         className="w-full h-full object-cover"
                       />
                     ) : (
-                      <span className="text-xl font-bold text-purple-700 font-syne">
+                      <span className="text-2xl font-bold text-purple-700 font-syne">
                         {initials}
                       </span>
                     )}
@@ -173,12 +164,13 @@ export default function StudentDetail() {
                     </label>
                   )}
                 </div>
-                <div className="pb-1">
-                  <h1 className="text-xl font-bold text-gray-900 font-syne">
-                    {student.firstName} {student.lastName}
-                  </h1>
-                  <p className="text-sm text-gray-400">{student.email}</p>
-                </div>
+                <h1 className="mt-3 text-xl font-bold text-gray-900 font-syne">
+                  {student.firstName} {student.lastName}
+                </h1>
+                <p className="text-sm text-gray-400">{student.email}</p>
+                <span className="mt-1.5 inline-block bg-purple-100 text-purple-800 text-xs px-2.5 py-0.5 rounded-full font-medium">
+                  Student
+                </span>
               </div>
 
               {/* Divider */}
